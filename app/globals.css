@@ -1,0 +1,2044 @@
+@import "tailwindcss";
+
+/* ============================================================
+   BigChungyTV — "high-roller noir"
+   Palette is derived from the brand avatar: warm charcoal values
+   with a single saturated gold chroma. Gold is reserved for money,
+   prizes, and the primary CTA. Nowhere else.
+   ============================================================ */
+
+:root {
+  --font-display: var(--font-archivo), system-ui, sans-serif;
+  --font-body: var(--font-inter), system-ui, sans-serif;
+
+  --bg-deep: #141210;
+  --bg: #1b1815;
+  --panel: #24201c;
+  --panel-strong: #2e2926;
+  --line: #3a342e;
+
+  --steel: #8b8279;
+  --steel-bright: #c3bab0;
+
+  --fg: #f5f1ea;
+  --muted: #9a9187;
+
+  --gold: #efa820;
+  --gold-bright: #f8c95c;
+  --gold-deep: #8a5a12;
+  --amber: #de8a28;
+
+  /* Vault stage geometry — the SVG seam shares vault-backdrop.png's
+     intrinsic viewBox (1672x941), so the two stay aligned at any size.
+     Arc length = r * theta = 441 * 1.913rad = 844; rounded up so the
+     dash fully conceals the stroke before it traces. */
+  --seam-length: 850;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg-deep);
+  color: var(--fg);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--bg-deep);
+}
+
+/* --- layer 0: bokeh haze, barely there --------------------- */
+
+.heroBokeh {
+  position: absolute;
+  inset: -10%;
+  z-index: 0;
+  background-image: url("/bokeh.png");
+  background-size: cover;
+  background-position: center;
+  opacity: 0.28;
+  filter: blur(2px);
+  pointer-events: none;
+}
+
+/* --- layer 1: the vault, pushed back into atmosphere -------
+   Heavily darkened and blurred so the photoreal render reads as
+   environment rather than as an object competing with the
+   illustrated character in front of it. */
+
+.vaultStage {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  width: min(1900px, 168%);
+  aspect-ratio: 1672 / 941;
+  transform: translate(-77.6%, -50%);
+  pointer-events: none;
+}
+
+.vaultImg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  filter: brightness(0.72) blur(1px);
+  /* The render is a rectangle whose near-black background does not match
+     --bg-deep, so at wide viewports its left edge showed as a hard vertical
+     seam. Feathering it into the page removes the boundary entirely; the
+     ellipse is centred on the door (77.6%, 49.6% of the source image) so the
+     door and seam arc stay fully opaque. */
+  -webkit-mask-image: radial-gradient(
+    ellipse 66% 96% at 76% 50%,
+    #000 48%,
+    transparent 92%
+  );
+  mask-image: radial-gradient(
+    ellipse 66% 96% at 76% 50%,
+    #000 48%,
+    transparent 92%
+  );
+}
+
+.vaultSeam {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.vaultSeam path {
+  fill: none;
+  stroke: var(--gold-bright);
+  stroke-width: 7;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 14px rgba(239, 168, 32, 0.85))
+    drop-shadow(0 0 46px rgba(239, 168, 32, 0.45));
+  stroke-dasharray: var(--seam-length);
+  stroke-dashoffset: var(--seam-length);
+}
+
+/* --- layer 2: gold bloom behind the figure ----------------- */
+
+.heroBloom {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  width: min(880px, 88vw);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%) scale(0.6);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(239, 168, 32, 0.38) 0%,
+    rgba(222, 138, 40, 0.16) 38%,
+    transparent 68%
+  );
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* --- layer 3: content -------------------------------------- */
+
+.hero {
+  display: grid;
+  place-items: center;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 3;
+  width: min(760px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 7rem 1.5rem 9rem;
+  text-shadow: 0 3px 22px rgba(0, 0, 0, 0.55);
+}
+
+/* Centring the copy put it on top of the brightest part of the vault, where
+   gold-on-gold lost contrast. A soft scrim sits between them — wide enough to
+   cover the text column, invisible at its edges. */
+.heroContent::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 2rem -14% 4rem;
+  background: radial-gradient(
+    ellipse 62% 54% at 50% 50%,
+    rgba(12, 10, 9, 0.82) 0%,
+    rgba(12, 10, 9, 0.6) 45%,
+    transparent 76%
+  );
+  pointer-events: none;
+}
+
+.heroContent > * {
+  opacity: 0;
+}
+
+
+.heroKicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 0.45rem 0.8rem;
+  background: rgba(36, 32, 28, 0.6);
+  backdrop-filter: blur(6px);
+}
+
+.heroKicker::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 8px var(--gold);
+}
+
+.wordmark {
+  margin: 1.4rem 0 0;
+  font-family: var(--font-display);
+  /* "BigChungyTV" is 11 characters, so the expanded width axis and the
+     display size both have to come back to keep it on one line inside
+     the copy column. Measured: at wdth 118 / 86px it overflowed 595px
+     of column by 191px. */
+  font-variation-settings: "wdth" 110;
+  font-weight: 800;
+  font-size: clamp(2rem, 5.1vw, 4.1rem);
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  background: linear-gradient(
+    174deg,
+    #fdf0cf 0%,
+    var(--gold-bright) 34%,
+    var(--gold) 62%,
+    var(--gold-deep) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  /* bevel: a dark bottom edge so the letterforms read as struck metal */
+  filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.55))
+    drop-shadow(0 0 34px rgba(239, 168, 32, 0.25));
+}
+
+.heroTagline {
+  margin: 1.1rem 0 0;
+  font-size: clamp(1.05rem, 1.7vw, 1.3rem);
+  font-weight: 500;
+  color: var(--fg);
+}
+
+.heroSummary {
+  margin: 0.7rem 0 0;
+  max-width: 46ch;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.heroActions {
+  margin: 2rem 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+}
+
+.btn {
+  --btn-bg: var(--panel);
+  --btn-fg: var(--fg);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.9rem 1.5rem;
+  border-radius: 5px;
+  border: 1px solid var(--line);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" 110;
+  font-weight: 700;
+  font-size: 0.92rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+  /* struck-metal bevel */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--steel);
+}
+
+.btnGold {
+  --btn-bg: linear-gradient(180deg, var(--gold-bright), var(--gold));
+  --btn-fg: #1a1207;
+  border-color: var(--gold-bright);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.28),
+    0 0 28px rgba(239, 168, 32, 0.28);
+}
+
+.btnGold:hover {
+  border-color: #ffe6a8;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.28),
+    0 0 42px rgba(239, 168, 32, 0.45);
+}
+
+/* --- corner art -------------------------------------------- */
+/* Anchored bottom-right like Frizzy's mascot rather than occupying a grid
+   column: the centred copy stays the focal point and the art frames it. */
+
+.heroMascot {
+  position: absolute;
+  z-index: 3;
+  right: clamp(8px, 4vw, 90px);
+  bottom: 0;
+  width: clamp(190px, 27vw, 400px);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(28px) scale(0.97);
+}
+
+.heroMascot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 24px 44px rgba(0, 0, 0, 0.6));
+}
+
+/* the gold card he's holding — a flare pinned to its position */
+.cardFlare {
+  position: absolute;
+  z-index: 1;
+  /* tuned against chungy-hero.png's 1024x1536 framing */
+  left: 47%;
+  top: 29%;
+  width: 26%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%) scale(0.4);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 214, 122, 0.55) 0%,
+    rgba(239, 168, 32, 0.28) 40%,
+    transparent 70%
+  );
+  opacity: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+/* --- scroll cue -------------------------------------------- */
+
+.heroScroll {
+  position: absolute;
+  z-index: 3;
+  bottom: 1.8rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  opacity: 0;
+}
+
+.heroScroll:hover {
+  color: var(--fg);
+}
+
+/* ============================================================
+   INTRO CHOREOGRAPHY
+   Runs once per session. data-intro="instant" skips straight to
+   the resting state so returning visitors hit the CTA immediately.
+   ============================================================ */
+
+@keyframes seamTrace {
+  from {
+    stroke-dashoffset: var(--seam-length);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes vaultEmerge {
+  from {
+    opacity: 0;
+    transform: scale(1.06);
+  }
+  to {
+    opacity: 0.52;
+    transform: scale(1);
+  }
+}
+
+@keyframes bloomIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes figureArrive {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes flareIgnite {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.4);
+  }
+  62% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.15);
+  }
+  100% {
+    opacity: 0.85;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes copyRise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ambient, post-intro */
+
+@keyframes seamBreathe {
+  0%,
+  100% {
+    opacity: 0.72;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes vaultDrift {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.03);
+  }
+}
+
+@keyframes flarePulse {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+:root[data-intro="run"] .hero .vaultSeam path {
+  animation:
+    seamTrace 900ms cubic-bezier(0.33, 1, 0.68, 1) 250ms forwards,
+    seamBreathe 6s ease-in-out 2600ms infinite;
+}
+
+:root[data-intro="run"] .hero .vaultImg {
+  animation:
+    vaultEmerge 1200ms ease-out 900ms forwards,
+    vaultDrift 24s ease-in-out 2600ms infinite alternate;
+}
+
+:root[data-intro="run"] .hero .heroBloom {
+  animation: bloomIn 1100ms ease-out 1150ms forwards;
+}
+
+:root[data-intro="run"] .hero .heroMascot {
+  animation: figureArrive 900ms cubic-bezier(0.16, 1, 0.3, 1) 1300ms forwards;
+}
+
+:root[data-intro="run"] .hero .cardFlare {
+  animation:
+    flareIgnite 700ms ease-out 1600ms forwards,
+    flarePulse 4s ease-in-out 2600ms infinite;
+}
+
+:root[data-intro="run"] .hero .heroContent > * {
+  animation: copyRise 640ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+:root[data-intro="run"] .hero .heroContent > *:nth-child(1) {
+  animation-delay: 1750ms;
+}
+:root[data-intro="run"] .hero .heroContent > *:nth-child(2) {
+  animation-delay: 1840ms;
+}
+:root[data-intro="run"] .hero .heroContent > *:nth-child(3) {
+  animation-delay: 1930ms;
+}
+:root[data-intro="run"] .hero .heroContent > *:nth-child(4) {
+  animation-delay: 2020ms;
+}
+:root[data-intro="run"] .hero .heroContent > *:nth-child(5) {
+  animation-delay: 2110ms;
+}
+
+:root[data-intro="run"] .hero .heroScroll {
+  animation: copyRise 640ms ease-out 2300ms forwards;
+}
+
+/* --- resting state (repeat visits + reduced motion) -------- */
+
+:root[data-intro="instant"] .hero .vaultSeam path {
+  stroke-dashoffset: 0;
+  animation: seamBreathe 6s ease-in-out infinite;
+}
+
+:root[data-intro="instant"] .hero .vaultImg {
+  opacity: 0.52;
+  animation: vaultDrift 24s ease-in-out infinite alternate;
+}
+
+:root[data-intro="instant"] .hero .heroBloom {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+:root[data-intro="instant"] .hero .heroMascot {
+  opacity: 1;
+  transform: none;
+}
+
+:root[data-intro="instant"] .hero .cardFlare {
+  opacity: 0.85;
+  transform: translate(-50%, -50%) scale(1);
+  animation: flarePulse 4s ease-in-out infinite;
+}
+
+:root[data-intro="instant"] .hero .heroContent > *,
+:root[data-intro="instant"] .hero .heroScroll {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero .vaultSeam path,
+  .hero .vaultImg,
+  .hero .heroBloom,
+  .hero .heroMascot,
+  .hero .cardFlare,
+  .hero .heroContent > *,
+  .hero .heroScroll {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+    stroke-dashoffset: 0;
+  }
+
+  .hero .vaultImg {
+    opacity: 0.52;
+  }
+
+  .hero .heroBloom {
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  .hero .cardFlare {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 900px) {
+  /* The whole hero has to clear a 844px phone viewport with the CTAs still
+     above the fold, so the figure is sized down hard and the vertical rhythm
+     tightens. Measured: at 380px wide the art alone was 456px tall and pushed
+     the buttons ~60px below the fold. */
+  .heroContent {
+    padding: 4.5rem 1.25rem 13rem;
+  }
+
+  /* Centred via auto margins, not translateX — the arrival animation owns the
+     transform property and would otherwise wipe out the centring. */
+  .heroMascot {
+    left: 0;
+    right: 0;
+    margin-inline: auto;
+    width: min(230px, 62%);
+  }
+
+  .wordmark {
+    margin-top: 1rem;
+  }
+
+  .heroTagline {
+    margin-top: 0.8rem;
+  }
+
+  .heroSummary {
+    margin-top: 0.6rem;
+    font-size: 0.95rem;
+  }
+
+  .heroActions {
+    margin-top: 1.5rem;
+    flex-wrap: nowrap;
+  }
+
+  /* At 390px the two CTAs overflowed 350px of usable width by ~8px and wrapped,
+     clipping the secondary button at the fold. Trimming the padding fits both
+     on one line. */
+  .heroActions .btn {
+    padding: 0.8rem 1.05rem;
+    font-size: 0.84rem;
+  }
+
+  .headerInner {
+    padding-inline: 1rem;
+    gap: 0.75rem;
+  }
+
+  .headerBrand {
+    font-size: 0.95rem;
+  }
+
+  .btnSm {
+    padding: 0.55rem 0.8rem;
+    font-size: 0.72rem;
+    white-space: nowrap;
+  }
+
+  .heroSummary {
+    margin-inline: auto;
+  }
+
+  .heroActions {
+    justify-content: center;
+  }
+
+  .vaultStage {
+    right: -34%;
+    width: 190%;
+    opacity: 0.75;
+  }
+
+  .heroBloom {
+    right: 50%;
+    top: 34%;
+    transform: translate(50%, -50%) scale(0.6);
+    width: min(560px, 92vw);
+  }
+
+  @keyframes bloomIn {
+    from {
+      opacity: 0;
+      transform: translate(50%, -50%) scale(0.6);
+    }
+    to {
+      opacity: 1;
+      transform: translate(50%, -50%) scale(1);
+    }
+  }
+
+  :root[data-intro="instant"] .hero .heroBloom {
+    transform: translate(50%, -50%) scale(1);
+  }
+}
+
+/* ============================================================
+   SITE CHROME
+   ============================================================ */
+
+.siteHeader {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: rgba(20, 18, 16, 0.82);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+
+.headerInner {
+  max-width: 1240px;
+  margin-inline: auto;
+  padding: 0.85rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.headerBrand {
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" 110;
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--fg);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.headerNav {
+  display: flex;
+  gap: 1.4rem;
+  margin-inline-start: auto;
+}
+
+.headerNav a {
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+.headerNav a:hover {
+  color: var(--fg);
+}
+
+.btnSm {
+  padding: 0.6rem 1rem;
+  font-size: 0.78rem;
+}
+
+/* ============================================================
+   SECTION SHELL
+   ============================================================ */
+
+.section {
+  position: relative;
+  padding: 6rem 0;
+  border-top: 1px solid var(--line);
+  background: var(--bg);
+}
+
+.sectionRaffle {
+  background:
+    radial-gradient(ellipse at 50% -10%, rgba(239, 168, 32, 0.09), transparent 62%),
+    var(--bg);
+}
+
+.sectionInner {
+  max-width: 1240px;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+
+.sectionKicker {
+  margin: 0;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.sectionTitle {
+  margin: 0.7rem 0 0;
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" 108;
+  font-weight: 800;
+  font-size: clamp(1.9rem, 3.6vw, 2.9rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: var(--fg);
+}
+
+.sectionLead {
+  margin: 0.9rem 0 0;
+  max-width: 58ch;
+  font-size: 1.02rem;
+  line-height: 1.65;
+  color: var(--muted);
+}
+
+.sectionLead strong {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.notice {
+  margin: 1.4rem 0 0;
+  padding: 0.7rem 1rem;
+  border: 1px dashed var(--line);
+  border-radius: 5px;
+  font-size: 0.86rem;
+  color: var(--muted);
+  background: rgba(36, 32, 28, 0.5);
+}
+
+/* ============================================================
+   BONUSES
+   ============================================================ */
+
+.bonusGrid {
+  margin-top: 2.6rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: 1.4rem;
+}
+
+.bonusCard {
+  display: flex;
+  flex-direction: column;
+  padding: 1.6rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: linear-gradient(180deg, var(--panel-strong), var(--panel));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5);
+}
+
+.bonusTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.bonusTag {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.bonusName {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  color: var(--steel-bright);
+}
+
+.bonusHeadline {
+  margin: 1.1rem 0 0;
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" 106;
+  font-weight: 800;
+  font-size: 1.5rem;
+  line-height: 1.15;
+  color: var(--fg);
+}
+
+.bonusDetail {
+  margin: 0.7rem 0 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.bonusPerks {
+  margin: 1.2rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.bonusPerks li {
+  position: relative;
+  padding-inline-start: 1.3rem;
+  font-size: 0.9rem;
+  color: var(--steel-bright);
+}
+
+.bonusPerks li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+  transform: rotate(45deg);
+  background: var(--gold);
+}
+
+.bonusFoot {
+  margin-top: auto;
+  padding-top: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.codeChip {
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0.5rem 0.8rem;
+  border: 1px dashed var(--line);
+  border-radius: 4px;
+}
+
+.codeChip strong {
+  color: var(--gold);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  letter-spacing: 0.14em;
+}
+
+/* ============================================================
+   RAFFLE
+   ============================================================ */
+
+.raffleTop {
+  margin-top: 2.6rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 1.4rem;
+  align-items: stretch;
+}
+
+.potCard {
+  position: relative;
+  overflow: hidden;
+  padding: 2.2rem 1.8rem;
+  border: 1px solid var(--gold-deep);
+  border-radius: 6px;
+  background:
+    radial-gradient(circle at 78% 20%, rgba(239, 168, 32, 0.18), transparent 58%),
+    linear-gradient(180deg, var(--panel-strong), var(--panel));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.potTicket {
+  position: absolute;
+  right: -34px;
+  top: 50%;
+  translate: 0 -50%;
+  width: 220px;
+  height: auto;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.potValue {
+  position: relative;
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" 112;
+  font-weight: 800;
+  font-size: clamp(3rem, 7vw, 4.6rem);
+  line-height: 0.95;
+  font-variant-numeric: tabular-nums;
+  color: var(--gold-bright);
+  text-shadow: 0 0 40px rgba(239, 168, 32, 0.35);
+}
+
+.potLabel {
+  position: relative;
+  margin-top: 0.4rem;
+  font-size: 0.95rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg);
+}
+
+.potSub {
+  position: relative;
+  margin-top: 0.7rem;
+  font-size: 0.86rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.raffleSide {
+  display: grid;
+  gap: 1.4rem;
+  align-content: stretch;
+}
+
+.drawBlock,
+.prizeList {
+  padding: 1.4rem 1.5rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+}
+
+.blockTitle {
+  margin: 0 0 0.9rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.countdown {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.countCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.7rem 0.3rem;
+  border-radius: 4px;
+  background: var(--bg-deep);
+  border: 1px solid var(--line);
+}
+
+.countValue {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.5rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--gold-bright);
+}
+
+.countLabel {
+  margin-top: 0.2rem;
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.prizeList {
+  margin: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.prizeList li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.prizeList li:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.prizePlace {
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.prizeAmount {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.25rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--gold);
+}
+
+/* --- calculator ------------------------------------------- */
+
+.calc {
+  margin-top: 1.4rem;
+  padding: 1.6rem 1.8rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+}
+
+.calcLabel {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.calcRow {
+  margin-top: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 320px;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--bg-deep);
+}
+
+.calcRow:focus-within {
+  border-color: var(--gold);
+}
+
+.calcPrefix {
+  color: var(--muted);
+  font-size: 1.1rem;
+}
+
+.calcInput {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--fg);
+  font-family: inherit;
+  font-size: 1.1rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.calcResult {
+  margin-top: 1.4rem;
+}
+
+.calcTickets {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+
+.calcBig {
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" 112;
+  font-weight: 800;
+  font-size: 2.6rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--gold-bright);
+}
+
+.calcUnit {
+  font-size: 0.9rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.calcMeter {
+  margin-top: 1rem;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--bg-deep);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.calcMeterFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold-deep), var(--gold-bright));
+  transition: width 220ms ease;
+}
+
+.calcHint {
+  margin: 0.7rem 0 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.calcHint strong {
+  color: var(--gold);
+}
+
+/* --- entrant table ---------------------------------------- */
+
+.tableWrap {
+  margin-top: 1.4rem;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+}
+
+.entrantTable {
+  width: 100%;
+  min-width: 520px;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.tableCaption {
+  padding: 1rem 1.2rem;
+  text-align: left;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.entrantTable th,
+.entrantTable td {
+  padding: 0.8rem 1.2rem;
+  text-align: left;
+  border-top: 1px solid var(--line);
+}
+
+.entrantTable th {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.entrantTable .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.entrantTable .strong {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.entrantTable .muted {
+  color: var(--muted);
+}
+
+.entrantTable tbody tr:hover {
+  background: rgba(239, 168, 32, 0.04);
+}
+
+.tableFoot {
+  margin: 0.9rem 0 0;
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+
+/* ============================================================
+   STREAM
+   ============================================================ */
+
+.streamFrame {
+  margin-top: 2.4rem;
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--bg-deep);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 24px 60px rgba(0, 0, 0, 0.5);
+}
+
+.streamEmbed {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.streamActions {
+  margin-top: 1.4rem;
+  display: flex;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.liveDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #1a1207;
+  animation: livePulse 1.8s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+
+.siteFooter {
+  border-top: 1px solid var(--line);
+  background: var(--bg-deep);
+}
+
+.footerInner {
+  max-width: 1240px;
+  margin-inline: auto;
+  padding: 3rem 1.5rem 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.footerBrand {
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" 110;
+  font-weight: 800;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  color: var(--fg);
+}
+
+.footerNote {
+  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.footerNote strong {
+  color: var(--gold);
+}
+
+.footerSocials {
+  display: flex;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+}
+
+.footerSocials a {
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.footerSocials a:hover {
+  color: var(--gold);
+}
+
+.footerLegal {
+  max-width: 1240px;
+  margin-inline: auto;
+  padding: 1.5rem 1.5rem 3rem;
+  border-top: 1px solid var(--line);
+}
+
+.footerLegal p {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--muted);
+  max-width: 78ch;
+}
+
+.footerLegal a {
+  color: var(--steel-bright);
+}
+
+.footerCopy {
+  margin-top: 0.6rem !important;
+  opacity: 0.75;
+}
+
+/* ============================================================
+   RESPONSIVE — sections
+   ============================================================ */
+
+@media (max-width: 900px) {
+  .section { padding: 4rem 0; }
+  .raffleTop { grid-template-columns: minmax(0, 1fr); }
+  .potTicket { width: 160px; right: -40px; opacity: 0.35; }
+  .headerNav { display: none; }
+}
+
+/* ============================================================
+   BANDS + SHARED SECTION SHELL  (Frizzy's layout structure)
+   ============================================================ */
+
+.band {
+  position: relative;
+  display: flow-root;
+}
+
+.bandBase {
+  background: var(--bg);
+}
+
+.bandDeep {
+  background: var(--bg-deep);
+}
+
+.bandPromo {
+  background:
+    radial-gradient(ellipse 70% 90% at 50% 0%, rgba(239, 168, 32, 0.07), transparent 62%),
+    var(--bg);
+}
+
+.homeSection,
+.promoBanner,
+.raffleSection,
+.pageHeroInner,
+.footerInner,
+.footerLegal,
+.headerInner {
+  width: min(1160px, calc(100% - 48px));
+  margin-inline: auto;
+}
+
+.homeSection {
+  padding: 5.5rem 0 4.5rem;
+}
+
+.centerHeading {
+  text-align: center;
+}
+
+.centerHeading h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" 112;
+  font-weight: 800;
+  font-size: clamp(2.1rem, 4.6vw, 3rem);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--fg);
+}
+
+.underCode {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 0.9rem 0 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.underCode strong {
+  color: var(--gold);
+  letter-spacing: 0.14em;
+}
+
+/* ============================================================
+   BONUS CARD ANATOMY
+   ============================================================ */
+
+.bonusGrid {
+  margin-top: 2.8rem;
+}
+
+.bonusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.bonusBadge::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 8px var(--gold);
+}
+
+.bonusLogoWrap {
+  margin-top: 1.1rem;
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.bonusLogo {
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" 112;
+  font-weight: 800;
+  font-size: 1.9rem;
+  text-transform: uppercase;
+  color: var(--steel-bright);
+}
+
+.bonusDesc {
+  margin: 0.7rem 0 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.bonusBox {
+  margin-top: 1.3rem;
+  padding: 1.2rem;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--bg-deep);
+}
+
+.bonusBoxLabel {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.bonusAmountRow {
+  margin-top: 0.5rem;
+}
+
+.bonusAmount {
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" 110;
+  font-weight: 800;
+  font-size: 1.55rem;
+  line-height: 1.15;
+  color: var(--gold-bright);
+}
+
+.bonusFeatures {
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.bonusFeatures li {
+  position: relative;
+  padding-inline-start: 1.2rem;
+  font-size: 0.88rem;
+  color: var(--steel-bright);
+}
+
+.bonusFeatures li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+  transform: rotate(45deg);
+  background: var(--gold);
+}
+
+.bonusCta {
+  margin-top: 1.4rem;
+  justify-content: center;
+}
+
+.bonusNote {
+  margin: 0.8rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* ============================================================
+   RAFFLE PROMO BANNER
+   ============================================================ */
+
+.promoBanner {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 0.82fr) minmax(380px, 1fr);
+  gap: 2.8rem;
+  align-items: center;
+  margin-block: 4.5rem 6rem;
+  padding: 3rem 3.2rem;
+  overflow: hidden;
+  border: 1px solid var(--gold-deep);
+  border-radius: 8px;
+  background:
+    radial-gradient(ellipse 68% 95% at 100% 50%, rgba(239, 168, 32, 0.11), transparent 62%),
+    linear-gradient(120deg, rgba(239, 168, 32, 0.06), transparent 55%),
+    var(--panel);
+}
+
+.promoBanner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: url("/metal.png") center / cover no-repeat;
+  opacity: 0.16;
+  pointer-events: none;
+}
+
+.promoBanner > * {
+  position: relative;
+  z-index: 1;
+}
+
+.promoCopy h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" 110;
+  font-weight: 800;
+  font-size: clamp(1.9rem, 4vw, 2.7rem);
+  line-height: 1.04;
+  text-transform: uppercase;
+  color: var(--fg);
+}
+
+.promoCopy h2 span {
+  color: var(--gold-bright);
+}
+
+.promoCopy p {
+  max-width: 34ch;
+  margin: 1rem 0 1.6rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.promoStats {
+  position: relative;
+  display: grid;
+  gap: 1rem;
+}
+
+.promoTicket {
+  position: absolute;
+  right: -40px;
+  top: -30px;
+  width: 200px;
+  height: auto;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.promoStat {
+  display: flex;
+  flex-direction: column;
+}
+
+.promoStatValue {
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" 112;
+  font-weight: 800;
+  font-size: clamp(2.6rem, 6vw, 3.8rem);
+  line-height: 0.95;
+  font-variant-numeric: tabular-nums;
+  color: var(--gold-bright);
+  text-shadow: 0 0 40px rgba(239, 168, 32, 0.3);
+}
+
+.promoStatLabel {
+  margin-top: 0.35rem;
+  font-size: 0.82rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg);
+}
+
+.promoStatRow {
+  display: flex;
+  gap: 2rem;
+}
+
+.promoStatSm span {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.15rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--steel-bright);
+}
+
+.promoStatSm small {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.promoDraw {
+  margin-top: 0.4rem;
+}
+
+/* ============================================================
+   INNER PAGE (/raffle)
+   ============================================================ */
+
+.pageHero {
+  position: relative;
+  padding: 4.5rem 0 3rem;
+  background:
+    radial-gradient(ellipse 80% 70% at 50% 0%, rgba(239, 168, 32, 0.1), transparent 65%),
+    var(--bg-deep);
+  border-bottom: 1px solid var(--line);
+  text-align: center;
+}
+
+.pageHeroInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pageTitle {
+  margin: 1rem 0 0;
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" 112;
+  font-weight: 800;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  background: linear-gradient(174deg, #fdf0cf 0%, var(--gold-bright) 40%, var(--gold) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.pageLead {
+  max-width: 58ch;
+  margin: 1rem 0 0;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--muted);
+}
+
+.pageLead strong {
+  color: var(--gold);
+}
+
+.raffleSection {
+  padding: 3.5rem 0 5rem;
+}
+
+.raffleRules {
+  margin-top: 2.4rem;
+  padding: 1.8rem 2rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+}
+
+.raffleRules h2 {
+  margin: 0 0 1.1rem;
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" 108;
+  font-weight: 800;
+  font-size: 1.35rem;
+  text-transform: uppercase;
+  color: var(--fg);
+}
+
+.raffleRules ol {
+  margin: 0;
+  padding-inline-start: 1.2rem;
+  display: grid;
+  gap: 0.7rem;
+  color: var(--steel-bright);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.raffleRules ol::marker,
+.raffleRules li::marker {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.raffleRules strong {
+  color: var(--gold);
+}
+
+.rulesNote {
+  margin: 1.2rem 0 0;
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+
+.backLink {
+  margin: 2rem 0 0;
+}
+
+.backLink a {
+  color: var(--muted);
+  font-size: 0.88rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.backLink a:hover {
+  color: var(--gold);
+}
+
+/* ============================================================
+   RESPONSIVE — layout structure
+   ============================================================ */
+
+@media (max-width: 900px) {
+  .homeSection { padding: 4rem 0 3rem; }
+
+  .promoBanner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+    padding: 2rem 1.5rem;
+    margin-block: 3rem 4rem;
+  }
+
+  .promoTicket { display: none; }
+
+  .homeSection,
+  .promoBanner,
+  .raffleSection,
+  .pageHeroInner,
+  .footerInner,
+  .footerLegal,
+  .headerInner {
+    width: min(1160px, calc(100% - 32px));
+  }
+}
+
+/* ============================================================
+   AMBIENT MOTION — the hero has to stay alive after the intro
+   ============================================================ */
+
+.emberLayer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.embersBack { z-index: 1; }
+.embersFront { z-index: 3; }
+
+.ember {
+  position: absolute;
+  bottom: -8%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 226, 160, 0.95) 0%,
+    rgba(239, 168, 32, 0.75) 40%,
+    rgba(239, 168, 32, 0) 72%
+  );
+  box-shadow: 0 0 10px rgba(239, 168, 32, 0.55);
+  animation-name: emberRise;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform, opacity;
+}
+
+/* Rise and sway are on one element, so the sway period is folded into the
+   horizontal term rather than needing a second wrapper node. */
+@keyframes emberRise {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  25% {
+    transform: translate3d(14px, -25vh, 0);
+  }
+  50% {
+    transform: translate3d(-10px, -50vh, 0);
+  }
+  75% {
+    transform: translate3d(12px, -75vh, 0);
+  }
+  92% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(-6px, -104vh, 0);
+    opacity: 0;
+  }
+}
+
+/* Specular sweep across the wordmark, on a long loop so it reads as a
+   highlight catching the metal rather than as a repeating effect. */
+.wordmark {
+  position: relative;
+  background-size: 100% 100%, 220% 100%;
+  background-repeat: no-repeat;
+}
+
+:root[data-intro] .wordmark {
+  background-image:
+    linear-gradient(
+      174deg,
+      #fdf0cf 0%,
+      var(--gold-bright) 34%,
+      var(--gold) 62%,
+      var(--gold-deep) 100%
+    ),
+    linear-gradient(
+      100deg,
+      transparent 38%,
+      rgba(255, 255, 255, 0.85) 48%,
+      rgba(255, 255, 255, 0.95) 51%,
+      transparent 62%
+    );
+  background-blend-mode: normal, screen;
+  animation: wordmarkSheen 7.5s ease-in-out 3s infinite;
+}
+
+@keyframes wordmarkSheen {
+  0%,
+  62% {
+    background-position:
+      0 0,
+      -140% 0;
+  }
+  82%,
+  100% {
+    background-position:
+      0 0,
+      240% 0;
+  }
+}
+
+/* The art keeps breathing once it has arrived. */
+@keyframes mascotFloat {
+  from {
+    transform: translateY(0) rotate(-0.6deg);
+  }
+  to {
+    transform: translateY(-14px) rotate(0.6deg);
+  }
+}
+
+:root[data-intro] .hero .heroMascot img {
+  animation: mascotFloat 6s ease-in-out 2.4s infinite alternate;
+}
+
+/* A slow rotation on the door reads as machinery idling. */
+@keyframes vaultTurn {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.vaultHalo {
+  position: absolute;
+  left: 77.6%;
+  top: 49.6%;
+  width: 53%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  z-index: 2;
+  border-radius: 50%;
+  border: 1px dashed rgba(239, 168, 32, 0.22);
+  animation: vaultTurn 90s linear infinite;
+  pointer-events: none;
+  opacity: 0;
+}
+
+:root[data-intro="run"] .vaultHalo {
+  animation:
+    vaultTurn 90s linear infinite,
+    haloIn 1200ms ease-out 1600ms forwards;
+}
+
+:root[data-intro="instant"] .vaultHalo {
+  opacity: 1;
+}
+
+@keyframes haloIn {
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ember,
+  .vaultHalo,
+  :root[data-intro] .wordmark,
+  :root[data-intro] .hero .heroMascot img {
+    animation: none !important;
+  }
+
+  .ember { opacity: 0.4 !important; }
+  .vaultHalo { opacity: 1; }
+}
+
+@media (max-width: 900px) {
+  /* Halve the particle count on phones rather than scaling every mote down. */
+  .embersBack .ember:nth-child(n + 5),
+  .embersFront .ember:nth-child(n + 4) {
+    display: none;
+  }
+}
