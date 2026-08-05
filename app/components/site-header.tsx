@@ -4,7 +4,9 @@ export function SiteHeader() {
   return (
     <header className="siteHeader">
       <div className="headerInner">
-        <a className="headerBrand" href="#top">
+        {/* Root-relative for the same reason as NAV: a bare "#top" is a no-op
+            on /raffle, which left the wordmark as a dead link off the home page. */}
+        <a className="headerBrand" href="/#top">
           {BRAND}
         </a>
 

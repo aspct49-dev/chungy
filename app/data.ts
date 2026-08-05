@@ -52,7 +52,11 @@ export const SOCIALS = [
   },
 ] as const;
 
+// Root-relative, not bare fragments: "#top" resolves against whatever page you
+// are already on, so from /raffle it would do nothing. "/#top" navigates home
+// and then anchors.
 export const NAV = [
+  { label: "Home", href: "/#top" },
   { label: "Bonuses", href: "/#bonuses" },
   { label: "Raffle", href: "/raffle" },
   { label: "Stream", href: "/#stream" },
