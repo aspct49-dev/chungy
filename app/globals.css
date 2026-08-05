@@ -2218,8 +2218,12 @@ body {
     shaftBreathe 11s ease-in-out 1800ms infinite;
 }
 
+/* `both`, not `backwards`: the resting rule declares opacity 0, so a fill mode
+   that only covers the delay lets every line snap back to invisible the moment
+   its animation ends. `both` holds the from-state through the stagger delay and
+   the to-state afterwards. */
 :root[data-intro="run"] .heroCopy > * {
-  animation: copyRise 620ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation: copyRise 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 :root[data-intro="run"] .heroCopy > *:nth-child(1) { animation-delay: 1000ms; }

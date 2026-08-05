@@ -20,7 +20,13 @@ export type RaffleData = {
 };
 
 const CACHE_TTL_MS = 60_000;
-const REQUEST_TIMEOUT_MS = 15_000;
+/**
+ * Deliberately shorter than a serverless function's own ceiling. If the
+ * platform kills the invocation first, the catch in getRaffleData never runs
+ * and the visitor gets a 504 instead of the sample-data fallback — the whole
+ * point of the fallback is that an outage degrades rather than breaks.
+ */
+const REQUEST_TIMEOUT_MS = 8_000;
 const GAMDOM_ENDPOINT = "https://gamdom.com/api/affiliates/leaderboard";
 
 let cache: { at: number; data: RaffleData } | null = null;
@@ -146,7 +152,12 @@ async function fetchGamdom(apiKey: string): Promise<RaffleData> {
   try {
     const response = await fetch(url, {
       headers: { accept: "application/json" },
-      cache: "no-store",
+      // Revalidate rather than no-store: the module-level cache below only
+      // lives inside one serverless instance, so under any real traffic each
+      // instance would call Gamdom on its own clock. The framework data cache
+      // is shared, which is what actually holds the rate down. The in-memory
+      // cache is kept for its other job — serving stale on a failed fetch.
+      next: { revalidate: 60 },
       signal: controller.signal,
     });
 
