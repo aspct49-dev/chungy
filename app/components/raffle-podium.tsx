@@ -25,12 +25,17 @@ function Card({ entrant, rank }: { entrant: Entrant; rank: Rank }) {
 
         <div className="podiumName">{maskedName(entrant.name)}</div>
 
-        <div className="podiumLabel">Tickets</div>
-        <div className="ticketPill">{count(entrant.tickets)}</div>
+        <div className="podiumLabel">Wagered</div>
+        <div className="wagerPill">{money(entrant.wagered)}</div>
+      </div>
 
-        <div className="podiumWagered">{money(entrant.wagered)} wagered</div>
-
-        <div className="podiumOdds">{(entrant.odds * 100).toFixed(1)}% of the pot</div>
+      {/* The plinth carries the ticket count. Its height encodes rank, so the
+          number and the standing are legible in one glance. */}
+      <div className="podiumPlinth">
+        <span className="plinthValue">{count(entrant.tickets)}</span>
+        <span className="plinthLabel">
+          {entrant.tickets === 1 ? "ticket" : "tickets"}
+        </span>
       </div>
     </div>
   );
@@ -40,9 +45,7 @@ export function RafflePodium({ entrants }: { entrants: Entrant[] }) {
   const [first, second, third] = entrants;
   if (!first) return null;
 
-  // Rendered 2-1-3 so first place sits raised in the centre. DOM order is the
-  // visual order here because the cards carry explicit rank labels — nothing
-  // relies on source order to convey standing.
+  // 2-1-3 so first place stands raised in the centre.
   return (
     <div className="podium" data-reveal="section">
       {second && <Card entrant={second} rank={2} />}
