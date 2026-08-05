@@ -2,7 +2,17 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import ticketArt from "../../public/ticket.png";
-import { CASINO, RAFFLE, RAFFLE_POOL, WAGER_PER_TICKET, count, maskedName, money } from "../data";
+import {
+  CASINO,
+  RAFFLE,
+  RAFFLE_PLAYER_CAP,
+  RAFFLE_POOL,
+  RAFFLE_POOL_NOTE,
+  WAGER_PER_TICKET,
+  count,
+  maskedName,
+  money,
+} from "../data";
 import { getRaffleData, nextDrawIso } from "../lib/raffle";
 import { DrawCountdown } from "../components/draw-countdown";
 import { TicketCalculator } from "../components/ticket-calculator";
@@ -24,12 +34,19 @@ export default async function RafflePage() {
         <div className="pageHeroInner">
           <span className="heroKicker">The vault</span>
           <h1 id="raffle-title" className="pageTitle">
-            {money(RAFFLE_POOL)} drawn every month
+            {money(RAFFLE_POOL)}+ drawn every month
           </h1>
           <p className="pageLead">
             Every {money(WAGER_PER_TICKET)} wagered on {CASINO.name} under code{" "}
             <strong>{CASINO.code}</strong> puts one more ticket in the vault. No
             leaderboard, no top-ten cutoff &mdash; one ticket is enough to win.
+          </p>
+          <p className="pageNote">
+            The wheel is spun {RAFFLE.spins} times and each spin pays{" "}
+            {money(RAFFLE.prizePerSpin)}. One player can win more than once, up
+            to {RAFFLE.winCapPerPlayer} times ({money(RAFFLE_PLAYER_CAP)}).
+            Every game counts the same &mdash; wagering is unweighted.{" "}
+            {RAFFLE_POOL_NOTE}
           </p>
         </div>
       </section>
@@ -60,12 +77,18 @@ export default async function RafflePage() {
               </div>
 
               <ul className="prizeList">
-                {RAFFLE.prizes.map((prize) => (
-                  <li key={prize.place}>
-                    <span className="prizePlace">{prize.place}</span>
-                    <span className="prizeAmount">{money(prize.amount)}</span>
-                  </li>
-                ))}
+                <li>
+                  <span className="prizePlace">Spins per draw</span>
+                  <span className="prizeAmount">{RAFFLE.spins}</span>
+                </li>
+                <li>
+                  <span className="prizePlace">Each spin pays</span>
+                  <span className="prizeAmount">{money(RAFFLE.prizePerSpin)}</span>
+                </li>
+                <li>
+                  <span className="prizePlace">Max per player</span>
+                  <span className="prizeAmount">{money(RAFFLE_PLAYER_CAP)}</span>
+                </li>
               </ul>
             </div>
           </div>

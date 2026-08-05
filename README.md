@@ -26,25 +26,84 @@ All of these live in **`app/data.ts`**, flagged at the top of the file.
 
 | Value | Current | Notes |
 | --- | --- | --- |
-| `CASINO.code` | `CHUNGY` | Invented. Also appears in `CASINO.url`. |
+| `CASINO.code` | `CHUNGY` | Unconfirmed. Also appears in `CASINO.url`. |
 | `KICK_CHANNEL` | `bigchungytv` | Assumed from the brand name. `kick.com/api/v2/channels/bigchungytv` returns 403, so the stream embed renders blank until this is confirmed. |
-| `RAFFLE.prizes` | 2500 / 1000 / 500 | Invented split. `RAFFLE_POOL` is derived, so the headline updates automatically. |
 | `SOCIALS` | guessed handles | X, Discord, YouTube URLs are not verified. |
 | `BONUSES` | placeholder copy | Offer amounts and terms are invented. |
+
+## Raffle mechanics
+
+Confirmed rules, encoded in `app/data.ts`:
+
+- **1 ticket per $5,000 wagered** (`WAGER_PER_TICKET`) under the code.
+- The wheel is spun **35 times** per monthly draw (`RAFFLE.spins`), each spin
+  paying **$200** (`RAFFLE.prizePerSpin`) — a **$7,000** pool.
+- A player can win **more than once**, capped at **13 wins / $2,600**
+  (`RAFFLE.winCapPerPlayer`, `RAFFLE_PLAYER_CAP`).
+- Wagering is **unweighted** — every game and every dollar counts the same.
+- $7,000 is the **floor**, not a fixed figure. The pool is raised in months with
+  unusually high wagering, which is why the site says "$7,000+".
+
+Rules are subject to change if Gamdom changes the programme.
+
+`chanceOfAnyWin()` and `expectedWinnings()` in `app/data.ts` derive a player's
+odds across all 35 spins from their ticket share. The first is the complement of
+losing every spin; the second respects the per-player cap.
 
 ## Raffle data
 
 `app/lib/raffle.ts` reads from whichever source is configured, in order:
 
-1. `GAMDOM_CSV_URL` — a published CSV with `username,wagered` columns
-   (a Google Sheet "publish to web" link works).
-2. `GAMDOM_API_URL`, optionally with `GAMDOM_API_KEY` as a bearer token. The
-   current month's start/end are appended as `startDate` / `endDate` unless the
-   URL already sets them.
-3. Neither set — sample entrants render and the page shows a placeholder notice.
+1. **`GAMDOM_API_KEY`** — the live affiliate feed. Calls
+   `GET https://gamdom.com/api/affiliates/leaderboard?apikey=…&after=<1st of month>`.
+2. `GAMDOM_CSV_URL` — a published CSV with `username,wagered` columns, as a
+   manual fallback (a Google Sheet "publish to web" link works).
+3. Neither set — sample entrants render and the page shows a notice.
 
-Put these in `.env.local` (gitignored). Results cache for 60s and serve stale on
-a fetch failure, so an outage degrades rather than blanking the page.
+Put these in `.env` (gitignored). Results cache for 60s and serve stale on a
+fetch failure, so an outage degrades rather than blanking the page.
+
+### Getting an API key
+
+Log in to Gamdom with the affiliate account, then visit
+`https://gamdom.com/api/create-api-key`. It returns
+`{"success":true,"data":{"key":"…"}}` — **copy only the `key` value** into
+`.env` as `GAMDOM_API_KEY=`. You can only generate a key once; losing it needs a
+manual revoke by Gamdom support. Revoke your own with
+`https://gamdom.com/api/revoke-api-key?apikey=…`.
+
+The wager leaderboard is enabled **per affiliate**. A key alone is not enough —
+a Gamdom marketing manager has to switch the leaderboard on for the account.
+
+### Verifying it
+
+```bash
+npm run check:gamdom
+```
+
+Makes a real request with the configured key and reports affiliate count, total
+wagered, ticket count, and whether the response shape still matches
+`parseGamdom()`.
+
+Known snag: on a machine that intercepts TLS (corporate proxy or VPN) Node fails
+with `unable to verify the first certificate`. That is local, not a code fault —
+try `node --use-system-ca` or a different network. Deployments are unaffected.
+
+### Response shape
+
+Gamdom groups each affiliate's wagers **by month**, so one user can carry
+several buckets even with `after` set:
+
+```json
+{ "success": true,
+  "data": [ { "user_id": 123, "username": "someone",
+              "wager_data": [ { "month": "2026-08", "total_wager_usd": 12400 } ] } ] }
+```
+
+`parseGamdom()` sums only buckets matching the current `YYYY-MM`. Players who
+hide themselves return as `user_id: -1` / `"Hidden User"`; there can be many.
+They still wagered, so each is kept as a **distinct** entrant — collapsing them
+into one row would understate the pot and inflate everyone else's odds.
 
 Tickets are `floor(wagered / WAGER_PER_TICKET)`. The **full** entrant list is
 kept rather than truncated to a top ten — a raffle needs every ticket holder to
@@ -52,16 +111,24 @@ compute an honest pot size and odds percentage.
 
 ## Assets
 
-`public/` holds the generated art. `vault-backdrop.png` is load-bearing: the
-hero's animated seam is an SVG arc fitted to that render's own gold pixels
-(centre `1298,467`, radius `441` in its native `1672x941` space). Replacing the
-image means re-fitting `SEAM_PATH` and `--seam-length` in `app/components/hero.tsx`
-and `app/globals.css`.
+`public/` holds the generated art. The hero is built on `vault_backdrop_new.png`
+— a full vault room that lights from the upper left and leaves that wall empty,
+which is why the copy sits left and the door anchors right. `.roomImg` uses
+`object-position: 62% 50%` to keep the door in frame as the viewport narrows.
+
+`hero_seperation.png` (art-deco brass frieze) and `ticket_new.png` are available
+but not yet wired in. `vault-backdrop.png` and `bokeh.png` are from the previous
+hero and are now unused.
 
 ## Motion
 
-The intro sequence runs once per session (`sessionStorage`), then every reload
-lands on the resting state so the CTA is immediately reachable. Clear
-`sessionStorage` or open a new tab to replay it. Ambient loops — ember field,
-wordmark sheen, idle float, vault halo — run continuously and are all disabled
-under `prefers-reduced-motion`.
+The signature is the room **lighting up**: it opens at `brightness(0.18)` and
+`scale(1.08)`, a warm shaft grows along the render's own key light, then the
+copy staggers in and the figure steps forward. Nothing is bolted on that the art
+does not already imply.
+
+The intro runs once per session (`sessionStorage`), then every reload lands on
+the resting state so the CTA is immediately reachable. Clear `sessionStorage` or
+open a new tab to replay it. Ambient loops — slow room drift, shaft breathe,
+ember field, wordmark sheen — run continuously and are all disabled under
+`prefers-reduced-motion`.

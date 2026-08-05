@@ -41,14 +41,40 @@ export const WAGER_PER_TICKET = 5000;
 export const RAFFLE = {
   /** Drawn on the 1st of each month, so the countdown targets month end. */
   period: "month",
-  prizes: [
-    { place: "1st", amount: 2500 },
-    { place: "2nd", amount: 1000 },
-    { place: "3rd", amount: 500 },
-  ],
+  /** Spins per draw. Each spin pays PRIZE_PER_SPIN to whoever it lands on. */
+  spins: 35,
+  prizePerSpin: 200,
+  /** One player can win at most this many times in a single draw. */
+  winCapPerPlayer: 13,
 } as const;
 
-export const RAFFLE_POOL = RAFFLE.prizes.reduce((sum, p) => sum + p.amount, 0);
+/** 35 x $200. The floor, not a fixed figure — see RAFFLE_POOL_NOTE. */
+export const RAFFLE_POOL = RAFFLE.spins * RAFFLE.prizePerSpin;
+
+/** Most a single player can take home in one draw: 13 x $200. */
+export const RAFFLE_PLAYER_CAP = RAFFLE.winCapPerPlayer * RAFFLE.prizePerSpin;
+
+export const RAFFLE_POOL_NOTE =
+  "The pool is bumped above the minimum in months with unusually high wagering.";
+
+/**
+ * Chance of winning at least one of the 35 spins, given a ticket share.
+ * Complement of losing every spin. Ignores the per-player cap, which only
+ * caps winnings, never the chance of a first win.
+ */
+export function chanceOfAnyWin(tickets: number, totalTickets: number) {
+  if (tickets <= 0 || totalTickets <= 0) return 0;
+  const perSpin = Math.min(tickets / totalTickets, 1);
+  return 1 - Math.pow(1 - perSpin, RAFFLE.spins);
+}
+
+/** Expected winnings across the draw, respecting the per-player cap. */
+export function expectedWinnings(tickets: number, totalTickets: number) {
+  if (tickets <= 0 || totalTickets <= 0) return 0;
+  const perSpin = Math.min(tickets / totalTickets, 1);
+  const expectedWins = Math.min(perSpin * RAFFLE.spins, RAFFLE.winCapPerPlayer);
+  return expectedWins * RAFFLE.prizePerSpin;
+}
 
 // --- bonuses ------------------------------------------------
 

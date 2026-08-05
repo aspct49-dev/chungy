@@ -4,7 +4,7 @@ export type Entrant = {
   name: string;
   wagered: number;
   tickets: number;
-  /** Share of the pot, 0-1. Only meaningful because the full list is kept. */
+  /** Share of the ticket pot, 0-1. Honest only because the full list is kept. */
   odds: number;
 };
 
@@ -13,11 +13,16 @@ export type RaffleData = {
   totalTickets: number;
   totalWagered: number;
   entrantCount: number;
-  /** True when no live source is configured and dummy data is showing. */
+  /** True when no live source is configured and sample data is showing. */
   placeholder: boolean;
+  /** Set when a live source was configured but the fetch failed. */
+  error: string | null;
 };
 
 const CACHE_TTL_MS = 60_000;
+const REQUEST_TIMEOUT_MS = 15_000;
+const GAMDOM_ENDPOINT = "https://gamdom.com/api/affiliates/leaderboard";
+
 let cache: { at: number; data: RaffleData } | null = null;
 
 function env(name: string): string | undefined {
@@ -25,15 +30,27 @@ function env(name: string): string | undefined {
   return value && value.trim() !== "" ? value.trim() : undefined;
 }
 
-function monthRange() {
+/** YYYY-MM-DD for the first of the current UTC month. */
+export function monthStartIso() {
   const now = new Date();
-  return {
-    start: new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString(),
-    end: new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1)).toISOString(),
-  };
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1))
+    .toISOString()
+    .slice(0, 10);
 }
 
-const DUMMY: Array<{ name: string; wagered: number }> = [
+/** YYYY-MM for the current UTC month, matching Gamdom's wager_data keys. */
+function currentMonthKey() {
+  const now = new Date();
+  return `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}`;
+}
+
+/** First instant of next month, UTC — what the countdown targets. */
+export function nextDrawIso() {
+  const now = new Date();
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1)).toISOString();
+}
+
+const SAMPLE: Array<{ name: string; wagered: number }> = [
   { name: "VaultRunner", wagered: 412384.22 },
   { name: "GoldTooth", wagered: 298541.1 },
   { name: "MidnightAce", wagered: 244098.75 },
@@ -54,8 +71,11 @@ const DUMMY: Array<{ name: string; wagered: number }> = [
 
 // A raffle is not a leaderboard: every ticket holder is in the draw, so the
 // full list has to be kept. Truncating to a top ten would make the pot size
-// and every odds figure on the page a lie.
-function toEntrants(rows: Array<{ name: string; wagered: number }>): RaffleData {
+// and every odds figure on the page wrong.
+export function toRaffleData(
+  rows: Array<{ name: string; wagered: number }>,
+  meta: { placeholder?: boolean; error?: string | null } = {}
+): RaffleData {
   const withTickets = rows
     .filter((row) => Number.isFinite(row.wagered) && row.wagered > 0)
     .map((row) => ({ ...row, tickets: ticketsFor(row.wagered) }))
@@ -73,11 +93,76 @@ function toEntrants(rows: Array<{ name: string; wagered: number }>): RaffleData 
     totalTickets,
     totalWagered,
     entrantCount: withTickets.length,
-    placeholder: false,
+    placeholder: meta.placeholder ?? false,
+    error: meta.error ?? null,
   };
 }
 
-/** Parses a published CSV (e.g. a Google Sheet) with username,wagered columns. */
+type GamdomEntry = {
+  user_id?: number;
+  username?: string;
+  wager_data?: Array<{ month?: string; total_wager_usd?: number | string }>;
+};
+
+/**
+ * Flattens Gamdom's response into name/wagered rows for the current month.
+ *
+ * The API groups each affiliate's wagers by month, so a single user can carry
+ * several buckets even with `after` set — the filter is what keeps a player's
+ * previous months out of this month's ticket count.
+ *
+ * Players who hide themselves come back as user_id -1 / "Hidden User", and
+ * there can be many of them. They still wagered, so their tickets belong in
+ * the pot; collapsing them into one row would understate the total and inflate
+ * everyone else's odds. Each is kept as a distinct entrant.
+ */
+export function parseGamdom(payload: unknown, monthKey = currentMonthKey()) {
+  const data = (payload as { data?: unknown })?.data;
+  if (!Array.isArray(data)) return [];
+
+  let hidden = 0;
+  return data
+    .map((raw) => {
+      const entry = raw as GamdomEntry;
+      const wagered = (entry.wager_data ?? [])
+        .filter((bucket) => !bucket.month || bucket.month === monthKey)
+        .reduce((sum, bucket) => sum + (Number(bucket.total_wager_usd) || 0), 0);
+
+      const isHidden = entry.user_id === -1 || entry.username === "Hidden User";
+      const name = isHidden ? `Hidden User ${++hidden}` : (entry.username ?? "player");
+
+      return { name, wagered };
+    })
+    .filter((row) => row.wagered > 0);
+}
+
+async function fetchGamdom(apiKey: string): Promise<RaffleData> {
+  const url = new URL(GAMDOM_ENDPOINT);
+  url.searchParams.set("apikey", apiKey);
+  url.searchParams.set("after", monthStartIso());
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    const response = await fetch(url, {
+      headers: { accept: "application/json" },
+      cache: "no-store",
+      signal: controller.signal,
+    });
+
+    if (!response.ok) throw new Error(`Gamdom API returned ${response.status}`);
+
+    const payload = await response.json();
+    if (payload?.success === false) {
+      throw new Error(payload.message || "Gamdom API reported failure");
+    }
+    return toRaffleData(parseGamdom(payload));
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+/** Published CSV with username,wagered columns — a manual fallback source. */
 function parseCsv(text: string): Array<{ name: string; wagered: number }> {
   return text
     .split(/\r?\n/)
@@ -91,48 +176,17 @@ function parseCsv(text: string): Array<{ name: string; wagered: number }> {
 }
 
 async function load(): Promise<RaffleData> {
-  const csvUrl = env("GAMDOM_CSV_URL");
-  const apiUrl = env("GAMDOM_API_URL");
+  const apiKey = env("GAMDOM_API_KEY");
+  if (apiKey) return fetchGamdom(apiKey);
 
+  const csvUrl = env("GAMDOM_CSV_URL");
   if (csvUrl) {
     const response = await fetch(csvUrl, { cache: "no-store" });
     if (!response.ok) throw new Error(`Gamdom CSV ${response.status}`);
-    return toEntrants(parseCsv(await response.text()));
+    return toRaffleData(parseCsv(await response.text()));
   }
 
-  if (apiUrl) {
-    const { start, end } = monthRange();
-    const url = new URL(apiUrl);
-    if (!url.searchParams.has("startDate")) url.searchParams.set("startDate", start);
-    if (!url.searchParams.has("endDate")) url.searchParams.set("endDate", end);
-
-    const headers: Record<string, string> = { accept: "application/json" };
-    const token = env("GAMDOM_API_KEY");
-    if (token) headers.Authorization = `Bearer ${token}`;
-
-    const response = await fetch(url, { headers, cache: "no-store" });
-    if (!response.ok) throw new Error(`Gamdom API ${response.status}`);
-
-    const payload: unknown = await response.json();
-    const list = Array.isArray(payload)
-      ? payload
-      : ((payload as { data?: unknown[] })?.data ??
-        (payload as { results?: unknown[] })?.results ??
-        []);
-    if (!Array.isArray(list)) return toEntrants([]);
-
-    return toEntrants(
-      list.map((entry) => {
-        const item = entry as { username?: string; name?: string; wagered?: number | string };
-        return {
-          name: item.username ?? item.name ?? "player",
-          wagered: Number(item.wagered ?? 0),
-        };
-      })
-    );
-  }
-
-  return { ...toEntrants(DUMMY), placeholder: true };
+  return toRaffleData(SAMPLE, { placeholder: true });
 }
 
 export async function getRaffleData(): Promise<RaffleData> {
@@ -142,13 +196,10 @@ export async function getRaffleData(): Promise<RaffleData> {
     cache = { at: Date.now(), data };
     return data;
   } catch (error) {
-    console.error("raffle fetch failed:", error);
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.error("raffle fetch failed:", message);
     // Serve stale rather than an empty page; an outage should degrade, not break.
-    return cache?.data ?? { ...toEntrants(DUMMY), placeholder: true };
+    if (cache) return { ...cache.data, error: message };
+    return toRaffleData(SAMPLE, { placeholder: true, error: message });
   }
-}
-
-/** Milliseconds until the draw (first instant of next month, UTC). */
-export function nextDrawIso() {
-  return monthRange().end;
 }

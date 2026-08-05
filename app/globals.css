@@ -2042,3 +2042,353 @@ body {
     display: none;
   }
 }
+
+/* ============================================================
+   HERO v2 — built on the vault-room render
+   The signature is the room lighting up: it opens near-dark,
+   a shaft grows from the render's own light source, then the
+   wordmark ignites. Nothing is bolted on that the art does not
+   already imply.
+   ============================================================ */
+
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: grid;
+  align-items: center;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--bg-deep);
+}
+
+.heroRoom {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.roomImg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* The door sits right of centre in the source; biasing the crop keeps it in
+     frame as the viewport narrows, instead of cropping it away. */
+  object-position: 62% 50%;
+  transform-origin: 62% 50%;
+  filter: brightness(0.18) saturate(0.7);
+  transform: scale(1.08);
+}
+
+/* Warm shaft matching the render's own key light from the upper left. */
+.lightShaft {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: linear-gradient(
+    118deg,
+    rgba(255, 214, 140, 0.28) 0%,
+    rgba(239, 168, 32, 0.1) 22%,
+    transparent 48%
+  );
+  mix-blend-mode: screen;
+}
+
+/* Keeps the lower edge dark so the band below joins without a seam. */
+.roomVignette {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(20, 18, 16, 0.72) 0%, transparent 22%),
+    linear-gradient(0deg, var(--bg-deep) 0%, rgba(20, 18, 16, 0) 26%),
+    radial-gradient(ellipse 58% 70% at 22% 48%, rgba(20, 18, 16, 0.78), transparent 70%);
+}
+
+.heroGrid {
+  position: relative;
+  z-index: 3;
+  width: min(1240px, 100%);
+  margin-inline: auto;
+  padding: 7rem 1.5rem 8rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.72fr);
+  gap: 2rem;
+  align-items: center;
+}
+
+.heroCopy > * {
+  opacity: 0;
+}
+
+.heroStats {
+  margin: 2.4rem 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.2rem;
+}
+
+.heroStats div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.heroStats dt {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.heroStats dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" 110;
+  font-weight: 800;
+  font-size: 1.5rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--gold-bright);
+}
+
+.heroFigure {
+  position: relative;
+  justify-self: end;
+  width: min(460px, 100%);
+  opacity: 0;
+}
+
+.heroFigure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.6));
+}
+
+/* --- the load sequence ------------------------------------- */
+
+@keyframes roomWake {
+  from {
+    filter: brightness(0.18) saturate(0.7);
+    transform: scale(1.08);
+  }
+  to {
+    filter: brightness(1) saturate(1);
+    transform: scale(1);
+  }
+}
+
+@keyframes roomDrift {
+  from { transform: scale(1); }
+  to { transform: scale(1.045); }
+}
+
+@keyframes shaftIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes shaftBreathe {
+  0%, 100% { opacity: 0.72; }
+  50% { opacity: 1; }
+}
+
+@keyframes copyRise {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes figureStep {
+  from { opacity: 0; transform: translateY(26px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+:root[data-intro="run"] .roomImg {
+  animation:
+    roomWake 1800ms cubic-bezier(0.22, 1, 0.36, 1) 120ms forwards,
+    roomDrift 34s ease-in-out 2000ms infinite alternate;
+}
+
+:root[data-intro="run"] .lightShaft {
+  animation:
+    shaftIn 1400ms ease-out 400ms forwards,
+    shaftBreathe 11s ease-in-out 1800ms infinite;
+}
+
+:root[data-intro="run"] .heroCopy > * {
+  animation: copyRise 620ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+:root[data-intro="run"] .heroCopy > *:nth-child(1) { animation-delay: 1000ms; }
+:root[data-intro="run"] .heroCopy > *:nth-child(2) { animation-delay: 1120ms; }
+:root[data-intro="run"] .heroCopy > *:nth-child(3) { animation-delay: 1240ms; }
+:root[data-intro="run"] .heroCopy > *:nth-child(4) { animation-delay: 1340ms; }
+:root[data-intro="run"] .heroCopy > *:nth-child(5) { animation-delay: 1440ms; }
+:root[data-intro="run"] .heroCopy > *:nth-child(6) { animation-delay: 1560ms; }
+
+:root[data-intro="run"] .heroFigure {
+  animation: figureStep 900ms cubic-bezier(0.16, 1, 0.3, 1) 900ms forwards;
+}
+
+/* Returning visitors land on the finished state. */
+:root[data-intro="instant"] .roomImg {
+  filter: brightness(1) saturate(1);
+  transform: scale(1);
+  animation: roomDrift 34s ease-in-out infinite alternate;
+}
+
+:root[data-intro="instant"] .lightShaft {
+  opacity: 1;
+  animation: shaftBreathe 11s ease-in-out infinite;
+}
+
+:root[data-intro="instant"] .heroCopy > *,
+:root[data-intro="instant"] .heroFigure {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .roomImg,
+  .lightShaft,
+  .heroCopy > *,
+  .heroFigure {
+    animation: none !important;
+    opacity: 1 !important;
+    filter: brightness(1) saturate(1) !important;
+    transform: none !important;
+  }
+  .lightShaft { opacity: 1 !important; }
+}
+
+/* --- scroll cue -------------------------------------------- */
+
+.heroScroll {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  bottom: 2rem;
+  translate: -50% 0;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 200ms ease;
+}
+
+.heroScroll:hover { color: var(--gold); }
+
+.heroScroll span {
+  width: 1px;
+  height: 30px;
+  background: linear-gradient(180deg, transparent, var(--gold));
+  animation: scrollPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.3; transform: scaleY(0.7); transform-origin: top; }
+  50% { opacity: 1; transform: scaleY(1); transform-origin: top; }
+}
+
+@media (max-width: 900px) {
+  .heroGrid {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 4.5rem 1.25rem 5.5rem;
+    gap: 1.25rem;
+    text-align: center;
+  }
+
+  .heroCopy { order: 2; }
+
+  .heroFigure {
+    order: 1;
+    justify-self: center;
+    width: min(230px, 54%);
+  }
+
+  .heroStats {
+    justify-content: center;
+    gap: 1.5rem;
+  }
+
+  .heroStats dd { font-size: 1.2rem; }
+
+  .heroSummary { margin-inline: auto; }
+  .heroActions { justify-content: center; }
+
+  .roomImg { object-position: 68% 50%; }
+}
+
+/* ============================================================
+   HERO v2 — mobile corrections
+   ============================================================ */
+
+/* Flex was shrinking the CTAs below their own text width, wrapping
+   "Enter the raffle" onto two lines instead of letting the row wrap. */
+.btn {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .heroActions {
+    flex-wrap: wrap;
+    gap: 0.7rem;
+  }
+
+  .heroActions .btn {
+    padding: 0.78rem 1rem;
+    font-size: 0.8rem;
+  }
+
+  /* The room render is busiest exactly where the copy sits once the layout
+     stacks, so body text needs a scrim to stay legible over the door. */
+  .heroCopy {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .heroCopy::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: -1.5rem -1.25rem;
+    background: radial-gradient(
+      ellipse 76% 60% at 50% 50%,
+      rgba(16, 14, 12, 0.9) 0%,
+      rgba(16, 14, 12, 0.72) 52%,
+      transparent 82%
+    );
+    pointer-events: none;
+  }
+
+  .heroStats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.6rem;
+    width: 100%;
+    margin-top: 1.8rem;
+  }
+
+  .heroStats dt {
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+  }
+
+  .heroStats dd {
+    font-size: 1.05rem;
+  }
+
+  /* The scroll cue lands under the fold once the hero stacks. */
+  .heroScroll {
+    display: none;
+  }
+}
