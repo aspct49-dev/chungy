@@ -26,10 +26,40 @@ All of these live in **`app/data.ts`**, flagged at the top of the file.
 
 | Value | Current | Notes |
 | --- | --- | --- |
-| `CASINO.code` | `CHUNGY` | Unconfirmed. Also appears in `CASINO.url`. |
-| `KICK_CHANNEL` | `bigchungytv` | Assumed from the brand name. `kick.com/api/v2/channels/bigchungytv` returns 403, so the stream embed renders blank until this is confirmed. |
-| `SOCIALS` | guessed handles | X, Discord, YouTube URLs are not verified. |
 | `BONUSES` | placeholder copy | Offer amounts and terms are invented. |
+
+Everything else is confirmed and verified live.
+
+`CASINO.url` is `https://gamdom.com/r/chungy` — **lowercase, as issued**. Both
+casings return 200, but they resolve to different affiliate params
+(`?aff=chungy` vs `?aff=CHUNGY`), so this is not cosmetic if Gamdom's
+attribution is case-sensitive. The displayed `CASINO.code` stays uppercase
+purely as type treatment; don't "tidy" the URL to match it.
+
+The Discord entry is an invite code, not a vanity URL. Discord serves an
+HTML page with a 200 for dead invites, so status codes prove nothing —
+check with `https://discord.com/api/v10/invites/<code>`, which returns guild
+JSON for a live invite and `Unknown Invite` for a dead one.
+
+### Known broken: the Kick stream embed
+
+The channel is real and live — `kick.com/api/v2/channels/bigchungytv` returns
+`id: 31289`, `is_banned: false`, with a working playback URL. The **embed** is
+the problem: the browser reports
+
+```
+Refused to display 'https://player.kick.com/' in a frame
+because it set 'X-Frame-Options' to 'sameorigin'
+```
+
+Note the URL in that error is the player **root**, not the channel path. Fetched
+directly, `player.kick.com/bigchungytv` returns 200 with no such header and no
+redirect — the bounce to root happens client-side, inside the iframe. Verified
+blocked on the deployed domain as well as localhost, so it is not an origin
+allowlist issue with `localhost`.
+
+`curl` cannot reproduce this. Any fix has to be checked in a real browser
+against the deployed site.
 
 ## Raffle mechanics
 

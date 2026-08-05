@@ -12,8 +12,16 @@ export const BRAND = "BigChungyTV";
 
 export const CASINO = {
   name: "Gamdom",
+  /** Displayed uppercase to match the type treatment; entry is case-insensitive. */
   code: "CHUNGY",
-  url: "https://gamdom.com/r/CHUNGY",
+  /**
+   * Confirmed referral link, lowercase exactly as issued. Both casings return
+   * 200, but they land on different affiliate params — /r/chungy resolves to
+   * `?aff=chungy` and /r/CHUNGY to `?aff=CHUNGY` — so the casing is not
+   * cosmetic if Gamdom's attribution is case-sensitive. Do not "tidy" this to
+   * match the displayed code.
+   */
+  url: "https://gamdom.com/r/chungy",
 } as const;
 
 export const KICK_CHANNEL = "bigchungytv";
@@ -24,19 +32,21 @@ export const SOCIALS = [
   { label: "Kick", href: KICK_URL, blurb: "Watch live streams", action: "Watch" },
   {
     label: "Discord",
-    href: "https://discord.gg/bigchungytv",
+    // Invite code, not a vanity URL — discord.gg/bigchungytv was a guess and
+    // does not resolve. This one is confirmed.
+    href: "https://discord.gg/wkBTZQUyrf",
     blurb: "Join the community",
     action: "Join",
   },
   {
     label: "X",
-    href: "https://x.com/bigchungytv",
+    href: "https://x.com/BigChungyTV",
     blurb: "Drops and announcements",
     action: "Follow",
   },
   {
     label: "YouTube",
-    href: "https://youtube.com/@bigchungytv",
+    href: "https://www.youtube.com/@bigchungytv",
     blurb: "Highlights and VODs",
     action: "Subscribe",
   },
