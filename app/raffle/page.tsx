@@ -16,6 +16,7 @@ import {
 import { getRaffleData, nextDrawIso } from "../lib/raffle";
 import { DrawCountdown } from "../components/draw-countdown";
 import { RafflePodium } from "../components/raffle-podium";
+import { RaffleStats } from "../components/raffle-stats";
 import { TicketCalculator } from "../components/ticket-calculator";
 
 export const dynamic = "force-dynamic";
@@ -57,29 +58,15 @@ export default async function RafflePage() {
 
       <div className="band bandBase">
         <section className="raffleSection">
-          {data.placeholder && (
-            <p className="notice">
-              Showing sample entrants. Live figures appear once the {CASINO.name}{" "}
-              feed is connected.
-            </p>
-          )}
 
           <div className="raffleTop" data-reveal="section">
-            <div className="potCard">
-              <Image className="potTicket" src={ticketArt} alt="" sizes="220px" />
-              <span className="potValue">{count(data.totalTickets)}</span>
-              <span className="potLabel">tickets in the vault</span>
-              <span className="potSub">
-                {count(data.entrantCount)} entrants &middot; {money(data.totalWagered)} wagered
-              </span>
+            <div className="drawBlock">
+              <Image className="drawTicket" src={ticketArt} alt="" sizes="180px" />
+              <p className="blockTitle">Draw closes in</p>
+              <DrawCountdown target={nextDrawIso()} />
             </div>
 
             <div className="raffleSide">
-              <div className="drawBlock">
-                <p className="blockTitle">Draw closes in</p>
-                <DrawCountdown target={nextDrawIso()} />
-              </div>
-
               <ul className="prizeList">
                 <li>
                   <span className="prizePlace">Spins per draw</span>
@@ -97,6 +84,8 @@ export default async function RafflePage() {
             </div>
           </div>
 
+          <RaffleStats data={data} />
+
           <RafflePodium entrants={data.entrants} />
 
           <TicketCalculator />
@@ -104,10 +93,11 @@ export default async function RafflePage() {
           <div className="tableWrap" data-reveal="section">
             <table className="entrantTable">
               <caption className="tableCaption">
-                Current ticket holders &mdash; every entrant is in the draw
+                Every ticket holder is in the draw
               </caption>
               <thead>
                 <tr>
+                  <th scope="col" className="rankCol">Rank</th>
                   <th scope="col">Player</th>
                   <th scope="col" className="num">Wagered</th>
                   <th scope="col" className="num">Tickets</th>
@@ -115,14 +105,21 @@ export default async function RafflePage() {
                 </tr>
               </thead>
               <tbody>
-                {data.entrants.map((entrant) => (
-                  <tr key={entrant.name}>
-                    <td>{maskedName(entrant.name)}</td>
-                    <td className="num">{money(entrant.wagered)}</td>
-                    <td className="num strong">{count(entrant.tickets)}</td>
-                    <td className="num muted">{(entrant.odds * 100).toFixed(1)}%</td>
-                  </tr>
-                ))}
+                {data.entrants.map((entrant, index) => {
+                  const rank = index + 1;
+                  const medal = rank === 1 ? "gold" : rank === 2 ? "silver" : rank === 3 ? "bronze" : "";
+                  return (
+                    <tr key={entrant.name}>
+                      <td className="rankCol">
+                        <span className={`rankPill ${medal}`}>{rank}</span>
+                      </td>
+                      <td>{maskedName(entrant.name)}</td>
+                      <td className="num">{money(entrant.wagered)}</td>
+                      <td className="num strong">{count(entrant.tickets)}</td>
+                      <td className="num muted">{(entrant.odds * 100).toFixed(1)}%</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

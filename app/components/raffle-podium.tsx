@@ -1,53 +1,53 @@
 import { count, maskedName, money } from "../data";
 import type { Entrant } from "../lib/raffle";
 
-// Rendered 2-1-3 so first place stands in the middle, the way a podium reads
-// in person. The DOM order still runs 1-2-3 for screen readers and keyboard
-// order; only the visual placement is reordered.
-const SLOTS = [
-  { place: 2, index: 1 },
-  { place: 1, index: 0 },
-  { place: 3, index: 2 },
-] as const;
+const META = {
+  1: { cls: "first", label: "1st" },
+  2: { cls: "second", label: "2nd" },
+  3: { cls: "third", label: "3rd" },
+} as const;
+
+type Rank = keyof typeof META;
+
+function initials(name: string) {
+  return name.charAt(0).toUpperCase() || "?";
+}
+
+function Card({ entrant, rank }: { entrant: Entrant; rank: Rank }) {
+  const meta = META[rank];
+  return (
+    <div className={`podiumCol ${meta.cls}`}>
+      <div className="podiumCard">
+        <div className="avatarWrap">
+          <div className="avatar">{initials(entrant.name)}</div>
+          <span className="rankBadge">{meta.label}</span>
+        </div>
+
+        <div className="podiumName">{maskedName(entrant.name)}</div>
+
+        <div className="podiumLabel">Tickets</div>
+        <div className="ticketPill">{count(entrant.tickets)}</div>
+
+        <div className="podiumWagered">{money(entrant.wagered)} wagered</div>
+
+        <div className="podiumOdds">{(entrant.odds * 100).toFixed(1)}% of the pot</div>
+      </div>
+    </div>
+  );
+}
 
 export function RafflePodium({ entrants }: { entrants: Entrant[] }) {
-  const top = entrants.slice(0, 3);
-  if (top.length < 3) return null;
+  const [first, second, third] = entrants;
+  if (!first) return null;
 
+  // Rendered 2-1-3 so first place sits raised in the centre. DOM order is the
+  // visual order here because the cards carry explicit rank labels — nothing
+  // relies on source order to convey standing.
   return (
     <div className="podium" data-reveal="section">
-      <h2 className="podiumHeading">Most tickets this month</h2>
-
-      <ol className="podiumRow">
-        {SLOTS.map(({ place, index }) => {
-          const entrant = top[index];
-          return (
-            <li className={`podiumSlot place${place}`} key={entrant.name} value={place}>
-              <div className="podiumCard">
-                <span className="podiumRank" aria-hidden="true">
-                  {place}
-                </span>
-
-                <span className="podiumName">{maskedName(entrant.name)}</span>
-
-                <span className="podiumTickets">
-                  <strong>{count(entrant.tickets)}</strong>
-                  <span>{entrant.tickets === 1 ? "ticket" : "tickets"}</span>
-                </span>
-
-                <span className="podiumWagered">{money(entrant.wagered)} wagered</span>
-                <span className="podiumOdds">{(entrant.odds * 100).toFixed(1)}% of the pot</span>
-              </div>
-              <div className="podiumBase" aria-hidden="true" />
-            </li>
-          );
-        })}
-      </ol>
-
-      <p className="podiumNote">
-        Standing here does not decide the draw &mdash; more tickets is better
-        odds, not a reserved prize. Every ticket holder is spun for.
-      </p>
+      {second && <Card entrant={second} rank={2} />}
+      <Card entrant={first} rank={1} />
+      {third && <Card entrant={third} rank={3} />}
     </div>
   );
 }

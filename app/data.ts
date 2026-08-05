@@ -78,26 +78,45 @@ export function expectedWinnings(tickets: number, totalTickets: number) {
 
 // --- bonuses ------------------------------------------------
 
+// Modelled on Gamdom's actual rewards programme rather than invented offers.
+// The welcome rakeback and the Rewards 2.0 tier ladder are the two things
+// worth signing up for, so they get one card each.
 export const BONUSES = [
   {
     name: "Gamdom",
-    tag: "Deposit bonus",
-    headline: "Up to $1,000 matched",
+    tag: "Welcome offer",
+    amount: "15%",
+    amountSuffix: "instant rakeback",
+    headline: "Paid back on every bet, from your first one",
     detail:
-      "Sign up under code CHUNGY and your first deposit is matched. Instant crypto withdrawals, no KYC on small cashouts.",
+      "Rakeback lands as you play rather than after a hurdle, and it is free of wagering requirements — what you earn is withdrawable.",
     code: CASINO.code,
     url: CASINO.url,
-    perks: ["Matched first deposit", "Rakeback on every wager", "Counts toward raffle tickets"],
+    perks: [
+      "No wagering requirement",
+      "Credited as you bet, not after",
+      "Runs through your first 7 days",
+      "Every wager also earns raffle tickets",
+    ],
+    note: "Apply the code at sign-up, or add it to an existing account.",
   },
   {
     name: "Gamdom",
-    tag: "Rain + rewards",
-    headline: "Daily rain and free cases",
+    tag: "Ongoing rewards",
+    amount: "24",
+    amountSuffix: "levels, 8 tiers",
+    headline: "Rewards 2.0 and the Royalty Club",
     detail:
-      "Playing under the code unlocks the community rain pool, daily free cases, and a rakeback tier that climbs the more you play.",
+      "Wagering earns XP, and XP climbs the ladder from Bronze to Opal. Each tier widens what you can claim — the rate improves the longer you play.",
     code: CASINO.code,
     url: CASINO.url,
-    perks: ["Community rain pool", "Daily free cases", "Climbing rakeback tiers"],
+    perks: [
+      "Chat Rain drops scale with your claim level",
+      "Free cases and reload bonuses",
+      "Rakeback rate climbs with each tier",
+      "Account manager at the top tiers",
+    ],
+    note: "Bronze → Silver → Gold → Sapphire → Ruby → Emerald → Opal.",
   },
 ] as const;
 

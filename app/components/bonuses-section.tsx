@@ -2,30 +2,33 @@ import { BONUSES, CASINO } from "../data";
 
 export function BonusesSection() {
   return (
-    <section className="homeSection" aria-label={`${CASINO.name} bonuses`}>
+    <section className="homeSection" aria-label={`${CASINO.name} rewards`}>
       <div className="centerHeading" data-reveal="heading">
-        <h2>Bonuses</h2>
+        <h2>Rewards</h2>
         <p className="underCode">
-          Exclusive perks under code <strong>{CASINO.code}</strong>
+          Unlocked under code <strong>{CASINO.code}</strong>
         </p>
       </div>
 
       <div className="bonusGrid">
         {BONUSES.map((bonus) => (
           <article className="bonusCard" key={bonus.tag} data-reveal="card">
-            <span className="bonusBadge">{bonus.tag}</span>
-
-            <div className="bonusLogoWrap">
-              <span className="bonusLogo">{bonus.name}</span>
+            <div className="bonusTop">
+              <span className="bonusBadge">{bonus.tag}</span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="bonusLogo" src="/gamdom-logo.png" alt={bonus.name} width={300} height={300} />
             </div>
 
+            <div className="bonusAmountRow">
+              <span className="bonusAmount">{bonus.amount}</span>
+              <span className="bonusAmountSuffix">{bonus.amountSuffix}</span>
+            </div>
+
+            <h3 className="bonusHeadline">{bonus.headline}</h3>
             <p className="bonusDesc">{bonus.detail}</p>
 
             <div className="bonusBox">
-              <span className="bonusBoxLabel">Exclusive bonus</span>
-              <div className="bonusAmountRow">
-                <span className="bonusAmount">{bonus.headline}</span>
-              </div>
+              <span className="bonusBoxLabel">What you get</span>
               <ul className="bonusFeatures">
                 {bonus.perks.map((perk) => (
                   <li key={perk}>{perk}</li>
@@ -42,9 +45,7 @@ export function BonusesSection() {
               Claim with {bonus.code} &#8599;
             </a>
 
-            <p className="bonusNote">
-              Wagers under this code count toward your raffle tickets.
-            </p>
+            <p className="bonusNote">{bonus.note}</p>
           </article>
         ))}
       </div>
