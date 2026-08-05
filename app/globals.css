@@ -45,6 +45,22 @@ body {
   padding: 0;
 }
 
+/* The design was drawn at browser-zoom 80%, so at 100% every rem-based size
+   lands a quarter too large. Scaling the root reproduces that at native zoom.
+   A percentage rather than a px value, so a reader who has raised their
+   browser's default font size still gets the benefit of it.
+   Note vw-based sizes are deliberately untouched: browser zoom scales the CSS
+   viewport inversely, so viewport units already render at the same physical
+   size at any zoom level — shrinking them here would overshoot.
+   Desktop only. The 80% reading was made in a desktop browser; phones render
+   at 100% with no practical way to zoom out, so applying it there would drop
+   body copy to ~12px and table cells below 12px on the smallest screens. */
+@media (min-width: 901px) {
+  html {
+    font-size: 80%;
+  }
+}
+
 body {
   background: var(--bg-deep);
   color: var(--fg);
