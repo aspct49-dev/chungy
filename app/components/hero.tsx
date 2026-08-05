@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import chungyHero from "../../public/chungy-hero.png";
+import mascot from "../../public/new.png";
 import { CASINO, KICK_URL, RAFFLE, RAFFLE_POOL, WAGER_PER_TICKET, money } from "../data";
 
 // Deterministic ember field, the way Frizzy seeds its bubbles: a fixed array
@@ -108,18 +108,18 @@ export function Hero() {
           </dl>
         </div>
 
-        <div className="heroFigure" aria-hidden="true">
-          <Image src={chungyHero} alt="" priority sizes="(max-width: 900px) 52vw, 460px" />
-          <span className="cardFlare" />
-        </div>
       </div>
 
       <EmberField embers={EMBERS_FRONT} layer="embersFront" />
 
-      <a className="heroScroll" href="#bonuses">
-        <span aria-hidden="true" />
-        Explore bonuses
-      </a>
+      {/* The mascot is deliberately layered *under* the frieze so the strip
+          cuts across his legs — he reads as standing behind it rather than
+          pasted on top of the section boundary. */}
+      <div className="heroMascot" aria-hidden="true">
+        <Image src={mascot} alt="" priority sizes="(max-width: 900px) 78vw, 620px" />
+      </div>
+
+      <div className="heroStrip" aria-hidden="true" />
     </section>
   );
 }

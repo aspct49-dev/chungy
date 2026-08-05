@@ -15,6 +15,7 @@ import {
 } from "../data";
 import { getRaffleData, nextDrawIso } from "../lib/raffle";
 import { DrawCountdown } from "../components/draw-countdown";
+import { RafflePodium } from "../components/raffle-podium";
 import { TicketCalculator } from "../components/ticket-calculator";
 
 export const dynamic = "force-dynamic";
@@ -32,14 +33,17 @@ export default async function RafflePage() {
     <main>
       <section className="pageHero" aria-labelledby="raffle-title">
         <div className="pageHeroInner">
-          <span className="heroKicker">The vault</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="casinoLogo" src="/gamdom-logo.png" alt={CASINO.name} width={300} height={300} />
           <h1 id="raffle-title" className="pageTitle">
-            {money(RAFFLE_POOL)}+ drawn every month
+            <span className="pageTitleAmount">{money(RAFFLE_POOL)}</span>
+            <span className="pageTitleWord">Raffle</span>
           </h1>
           <p className="pageLead">
             Every {money(WAGER_PER_TICKET)} wagered on {CASINO.name} under code{" "}
-            <strong>{CASINO.code}</strong> puts one more ticket in the vault. No
-            leaderboard, no top-ten cutoff &mdash; one ticket is enough to win.
+            <strong>{CASINO.code}</strong>{" "}
+            puts one more ticket in the vault. No leaderboard, no top-ten
+            cutoff &mdash; one ticket is enough to win.
           </p>
           <p className="pageNote">
             The wheel is spun {RAFFLE.spins} times and each spin pays{" "}
@@ -92,6 +96,8 @@ export default async function RafflePage() {
               </ul>
             </div>
           </div>
+
+          <RafflePodium entrants={data.entrants} />
 
           <TicketCalculator />
 
