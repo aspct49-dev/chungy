@@ -3171,9 +3171,16 @@ body {
 .heroMascot {
   /* Was clamp(320px, 40vw, 660px) at left 68%. Sized up hard and moved
      further right so he occupies the room's right third rather than
-     crowding the copy column. */
+     crowding the copy column.
+     The px bounds are then the 90%-zoom rendering of the previous
+     460/980 pair. Only those two needed scaling: on a wide screen the max
+     is what binds (58vw is ~1114px at 1920), and the vw term is already
+     zoom-invariant — browser zoom scales the CSS viewport inversely, so
+     58vw renders at the same physical size at any zoom. Below ~1520px the
+     vw term governs and this changes nothing, which is correct: at those
+     widths he already matched across zoom levels. */
   left: 76%;
-  width: clamp(460px, 58vw, 980px);
+  width: clamp(414px, 58vw, 882px);
 }
 
 /* The copy column has to hold its own ground now that he is this large. */
