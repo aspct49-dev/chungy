@@ -3229,6 +3229,38 @@ body {
   padding: 4rem 0 5rem;
 }
 
+/* Topographic contour texture behind the whole page.
+   `fixed`, not absolute: this element is a 1080px column, so an absolutely
+   positioned backdrop would stop at the content edge instead of reaching the
+   viewport. Fixed also keeps the texture still while the table scrolls over
+   it, so it reads as the surface the raffle sits on rather than a panel
+   sliding past.
+   The source is white line art on transparency, so it is used as a *mask*
+   over a gold gradient rather than drawn directly — that keeps the lines in
+   brand colour and lets them fade out down the page instead of tiling an
+   even sheet of texture across the content. */
+.rafflePage::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: radial-gradient(
+    ellipse 130% 90% at 50% 0%,
+    rgba(239, 168, 32, 0.5) 0%,
+    rgba(222, 138, 40, 0.16) 42%,
+    transparent 78%
+  );
+  -webkit-mask-image: url("/topo-overlay.webp");
+  mask-image: url("/topo-overlay.webp");
+  -webkit-mask-size: cover;
+  mask-size: cover;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
 .raffleHead {
   text-align: center;
 }
