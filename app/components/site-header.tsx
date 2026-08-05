@@ -1,4 +1,5 @@
 import { BRAND, CASINO, NAV } from "../data";
+import { MobileNav } from "./mobile-nav";
 
 export function SiteHeader() {
   return (
@@ -18,9 +19,16 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <a className="btn btnGold btnSm" href={CASINO.url} target="_blank" rel="noopener noreferrer">
+        <a
+          className="btn btnGold btnSm headerCta"
+          href={CASINO.url}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           Play on {CASINO.name}
         </a>
+
+        <MobileNav />
       </div>
     </header>
   );
