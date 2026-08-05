@@ -2,6 +2,7 @@ import { Hero } from "./components/hero";
 import { BonusesSection } from "./components/bonuses-section";
 import { StreamSection } from "./components/stream-section";
 import { RafflePromo } from "./components/raffle-promo";
+import { SocialsSection } from "./components/socials-section";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +21,10 @@ export default function Home() {
 
       <div className="band bandBase bandPromo">
         <RafflePromo />
+      </div>
+
+      <div className="band bandDeep bandSocials">
+        <SocialsSection />
       </div>
     </main>
   );

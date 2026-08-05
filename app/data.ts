@@ -21,10 +21,25 @@ export const KICK_URL = `https://kick.com/${KICK_CHANNEL}`;
 export const KICK_EMBED = `https://player.kick.com/${KICK_CHANNEL}`;
 
 export const SOCIALS = [
-  { label: "Kick", href: KICK_URL },
-  { label: "X", href: "https://x.com/bigchungytv" },
-  { label: "Discord", href: "https://discord.gg/bigchungytv" },
-  { label: "YouTube", href: "https://youtube.com/@bigchungytv" },
+  { label: "Kick", href: KICK_URL, blurb: "Watch live streams", action: "Watch" },
+  {
+    label: "Discord",
+    href: "https://discord.gg/bigchungytv",
+    blurb: "Join the community",
+    action: "Join",
+  },
+  {
+    label: "X",
+    href: "https://x.com/bigchungytv",
+    blurb: "Drops and announcements",
+    action: "Follow",
+  },
+  {
+    label: "YouTube",
+    href: "https://youtube.com/@bigchungytv",
+    blurb: "Highlights and VODs",
+    action: "Subscribe",
+  },
 ] as const;
 
 export const NAV = [
