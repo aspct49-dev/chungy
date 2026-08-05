@@ -2526,7 +2526,11 @@ body {
   display: block;
   width: clamp(150px, 18vw, 210px);
   height: auto;
-  margin: 0 auto 1.4rem;
+  /* The source was a 300x300 canvas holding a 272x64 mark, so 39% of its
+     height above and below the artwork was transparent padding — that, not
+     this margin, was the gap under the logo. Asset is now cropped to the
+     mark, so the spacing here is the real spacing. */
+  margin: 0 auto 1.9rem;
   /* The mark is Gamdom green — the one place on the site that colour is
      allowed, and only because it is their trademark. */
   filter: drop-shadow(0 0 24px rgba(0, 220, 130, 0.28));

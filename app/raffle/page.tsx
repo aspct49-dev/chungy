@@ -32,8 +32,8 @@ export default async function RafflePage() {
           className="casinoLogo"
           src="/gamdom-logo.png"
           alt={CASINO.name}
-          width={300}
-          height={300}
+          width={272}
+          height={64}
         />
 
         <h1 id="raffle-title" className="raffleTitle">

@@ -16,7 +16,7 @@ export function BonusesSection() {
             <div className="bonusTop">
               <span className="bonusBadge">{bonus.tag}</span>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="bonusLogo" src="/gamdom-logo.png" alt={bonus.name} width={300} height={300} />
+              <img className="bonusLogo" src="/gamdom-logo.png" alt={bonus.name} width={272} height={64} />
             </div>
 
             <div className="bonusAmountRow">
