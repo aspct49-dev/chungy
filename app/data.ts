@@ -164,9 +164,29 @@ export function count(value: number) {
 }
 
 /** Usernames are masked the way the casino exports them. */
+/**
+ * First character, then the tail two — "VaultRunner" reads as "V********er".
+ *
+ * Short names fall back to head-only. At five characters or fewer, showing
+ * both ends would give away most of the name, which defeats the point of
+ * masking it at all.
+ */
 export function maskedName(name: string) {
-  const head = name.slice(0, 2);
-  return `${head}${"*".repeat(Math.max(name.length - 2, 3))}`;
+  const trimmed = name.trim();
+
+  // Already anonymous. The feed returns "Hidden User" for players who hide
+  // themselves, and the loader numbers them to keep entrants distinct — mask
+  // that and you get "H********** 1", which looks broken and exposes the
+  // index while protecting nothing.
+  if (trimmed.startsWith("Hidden User")) return trimmed;
+
+  // A single character is its own tell; there is no masking to do but hide it.
+  if (trimmed.length < 2) return "***";
+
+  if (trimmed.length < 6) return `${trimmed.slice(0, 1)}***`;
+
+  const stars = Math.max(trimmed.length - 3, 3);
+  return `${trimmed.slice(0, 1)}${"*".repeat(stars)}${trimmed.slice(-2)}`;
 }
 
 export function ticketsFor(wagered: number) {
