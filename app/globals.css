@@ -249,13 +249,15 @@ body {
   /* "BigChungyTV" is 11 characters, so the expanded width axis and the
      display size both have to come back to keep it on one line inside
      the copy column. Measured: at wdth 118 / 86px it overflowed 595px
-     of column by 191px. */
+     of column by 191px. Set in mixed case, which is narrower than the
+     all-caps it replaced, so it clears that column with room to spare.
+     Tracking is a touch looser than the -0.03em the caps wanted —
+     lowercase needs the sidebearings that setting was eating. */
   font-variation-settings: "wdth" 110;
   font-weight: 800;
   font-size: clamp(2rem, 5.1vw, 4.1rem);
   line-height: 0.92;
-  letter-spacing: -0.03em;
-  text-transform: uppercase;
+  letter-spacing: -0.015em;
   background: linear-gradient(
     174deg,
     #fdf0cf 0%,
@@ -755,7 +757,6 @@ body {
   font-weight: 800;
   font-size: 1.05rem;
   letter-spacing: 0.01em;
-  text-transform: uppercase;
   color: var(--fg);
   text-decoration: none;
   white-space: nowrap;
@@ -1414,7 +1415,6 @@ body {
   font-variation-settings: "wdth" 110;
   font-weight: 800;
   font-size: 1.1rem;
-  text-transform: uppercase;
   color: var(--fg);
 }
 
