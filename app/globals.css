@@ -256,7 +256,13 @@ body {
   font-variation-settings: "wdth" 110;
   font-weight: 800;
   font-size: clamp(2rem, 5.1vw, 4.1rem);
-  line-height: 0.92;
+  /* Must contain the glyphs, not just the line. The gold is painted with
+     background-clip: text, and that gradient only fills the element's box —
+     so anything hanging outside it gets no paint and renders transparent.
+     At 0.92 the box was 41px against a 49px glyph extent, which sliced the
+     descenders off the g's and the y. All caps had no descenders to lose,
+     which is why this only appeared when the brand moved to mixed case. */
+  line-height: 1.15;
   letter-spacing: -0.015em;
   background: linear-gradient(
     174deg,
