@@ -44,7 +44,10 @@ export default async function RafflePage() {
 
         <p className="raffleSub">
           Every {money(WAGER_PER_TICKET)} wagered under code {CASINO.code} earns
-          one ticket. {RAFFLE.spins} spins, {money(RAFFLE.prizePerSpin)} each.
+          one ticket. {RAFFLE.spins} spins, {money(RAFFLE.prizePerSpin)}{" "}
+          each &mdash; capped at {RAFFLE.winCapPerPlayer} wins (
+          {money(RAFFLE_PLAYER_CAP)}) per player, so one account cannot take the
+          whole pool.
         </p>
 
         <div className="raffleCta">

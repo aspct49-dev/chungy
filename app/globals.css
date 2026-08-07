@@ -1428,6 +1428,23 @@ body {
   color: var(--gold);
 }
 
+/* The code doubles as the referral link. Underlined on hover rather than
+   always, so it keeps reading as part of the sentence while still being
+   discoverable as a link — and it inherits the gold the <strong> had. */
+.codeLink {
+  color: var(--gold);
+  font-weight: 700;
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+.codeLink:hover,
+.codeLink:focus-visible {
+  color: var(--gold-bright);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .footerSocials {
   display: flex;
   gap: 1.2rem;

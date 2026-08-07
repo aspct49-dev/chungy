@@ -8,7 +8,15 @@ export function SiteFooter() {
           <span className="footerBrand">{BRAND}</span>
           <p className="footerNote">
             Official {CASINO.name} partner. Play under code{" "}
-            <strong>{CASINO.code}</strong>.
+            <a
+              className="codeLink"
+              href={CASINO.url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {CASINO.code}
+            </a>
+            .
           </p>
         </div>
 
