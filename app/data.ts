@@ -219,6 +219,13 @@ export type PastWinner = {
   paid: boolean;
   /** Shown under the name. Says why a row sits outside the spins. */
   note?: string;
+  /**
+   * Set for a row whose tickets were not in the draw. It has to be explicit
+   * rather than inferred from the ticket count, because such a row can hold
+   * more tickets than the pot contains — dividing 506 by a 244-ticket pot
+   * would print an odds figure over 100%.
+   */
+  outsideDraw?: boolean;
 };
 
 export type PastDraw = {
@@ -246,10 +253,18 @@ export const PAST_DRAWS: PastDraw[] = [
     totalTickets: 244,
     entrants: 27,
     winners: [
-      // Paid on top of the 35 spins rather than out of them, so this row has
-      // no ticket share and no spins to its name. The wager behind it is
-      // deliberately not published.
-      { name: "ElderChungy", winnings: 3000, paid: true, note: "Top wager award" },
+      // Paid on top of the 35 spins rather than out of them, and these 506
+      // tickets were never in the pot: at 506 against a 244-ticket draw the
+      // spins would have landed here almost every time, and none did.
+      {
+        name: "ElderChungy",
+        wagered: 2528725,
+        tickets: 506,
+        winnings: 3000,
+        paid: true,
+        note: "Top wager award",
+        outsideDraw: true,
+      },
       { name: "SalfiMu", wagered: 294573, tickets: 59, spinsWon: 11, winnings: 2200, paid: true },
       { name: "DragonHazard", wagered: 203457, tickets: 41, spinsWon: 6, winnings: 1200, paid: true },
       { name: "Gang 72", wagered: 182147, tickets: 36, spinsWon: 5, winnings: 1000, paid: true },

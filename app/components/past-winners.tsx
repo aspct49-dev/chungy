@@ -12,7 +12,7 @@ import {
 const NONE = "—";
 
 function odds(winner: PastWinner, totalTickets: number) {
-  if (!winner.tickets || totalTickets <= 0) return NONE;
+  if (winner.outsideDraw || !winner.tickets || totalTickets <= 0) return NONE;
   return `${((winner.tickets / totalTickets) * 100).toFixed(1)}%`;
 }
 
@@ -93,8 +93,10 @@ export function PastWinners() {
 
       <p className="raffleFoot">
         Rows marked with an award were paid on top of the spins, not out of
-        them, so they carry no ticket share. Entrants who held tickets but won
-        no spin are counted in the totals rather than listed.
+        them, and their tickets were never in the pot &mdash; which is why they
+        show a wager and a ticket count but no odds, and why the draw total
+        does not include them. Entrants who held tickets but won no spin are
+        counted in the totals rather than listed.
       </p>
     </section>
   );
