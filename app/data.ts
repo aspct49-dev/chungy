@@ -202,22 +202,40 @@ export function ticketProgress(wagered: number) {
 
 export type PastWinner = {
   name: string;
-  wagered: number;
+  /**
+   * Left off for awards that were not drawn out of the ticket pot, and for
+   * anyone whose figure is deliberately not published.
+   */
+  wagered?: number;
   /**
    * As recorded on the draw sheet. Not recomputed with ticketsFor: the sheet
    * rounded where the site floors (294,573 was written up as 59 tickets, not
-   * 58), and the published odds were struck off these numbers. Recomputing
-   * would quietly disagree with the result that was actually paid out.
+   * 58), and the result was settled on these numbers. Recomputing would
+   * quietly disagree with the payouts that have already gone out.
    */
-  tickets: number;
-  spinsWon: number;
+  tickets?: number;
+  spinsWon?: number;
   winnings: number;
   paid: boolean;
+  /** Shown under the name. Says why a row sits outside the spins. */
+  note?: string;
 };
 
 export type PastDraw = {
   /** Shown as the table caption. */
   period: string;
+  /**
+   * Tickets across the whole draw, not just the rows listed below. The odds
+   * column divides by this.
+   *
+   * The two are not the same number and the difference is not cosmetic: 27
+   * players held tickets in this draw and only 9 of them won a spin, so
+   * summing the listed rows would divide by 208 instead of 244 and overstate
+   * every share on the page by about a sixth.
+   */
+  totalTickets: number;
+  /** Ticket holders in the draw, winners and non-winners alike. */
+  entrants: number;
   winners: PastWinner[];
 };
 
@@ -225,9 +243,15 @@ export type PastDraw = {
 export const PAST_DRAWS: PastDraw[] = [
   {
     period: "August 2026",
+    totalTickets: 244,
+    entrants: 27,
     winners: [
+      // Paid on top of the 35 spins rather than out of them, so this row has
+      // no ticket share and no spins to its name. The wager behind it is
+      // deliberately not published.
+      { name: "ElderChungy", winnings: 3000, paid: true, note: "Top wager award" },
       { name: "SalfiMu", wagered: 294573, tickets: 59, spinsWon: 11, winnings: 2200, paid: true },
-      { name: "SabirTheGambler", wagered: 203457, tickets: 41, spinsWon: 6, winnings: 1200, paid: true },
+      { name: "DragonHazard", wagered: 203457, tickets: 41, spinsWon: 6, winnings: 1200, paid: true },
       { name: "Gang 72", wagered: 182147, tickets: 36, spinsWon: 5, winnings: 1000, paid: true },
       { name: "GlitchyTomatoe6", wagered: 107664, tickets: 22, spinsWon: 3, winnings: 600, paid: true },
       { name: "P250Z", wagered: 104001, tickets: 21, spinsWon: 3, winnings: 600, paid: true },
@@ -240,12 +264,12 @@ export const PAST_DRAWS: PastDraw[] = [
 ];
 
 export function drawTotals(draw: PastDraw) {
-  return draw.winners.reduce(
+  const summed = draw.winners.reduce(
     (totals, winner) => ({
-      tickets: totals.tickets + winner.tickets,
-      spins: totals.spins + winner.spinsWon,
+      spins: totals.spins + (winner.spinsWon ?? 0),
       paid: totals.paid + winner.winnings,
     }),
-    { tickets: 0, spins: 0, paid: 0 }
+    { spins: 0, paid: 0 }
   );
+  return { ...summed, tickets: draw.totalTickets };
 }

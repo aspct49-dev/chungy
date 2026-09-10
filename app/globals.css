@@ -3729,6 +3729,16 @@ body {
   color: var(--fg);
 }
 
+.rowNote {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
 .captionMeta {
   font-size: 0.72rem;
   letter-spacing: 0.1em;
