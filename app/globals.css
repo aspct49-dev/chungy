@@ -3674,6 +3674,93 @@ body {
   color: var(--muted);
 }
 
+/* --- past draws --------------------------------------------- */
+
+.pastDraws {
+  margin-top: 4.5rem;
+  padding-top: 3.5rem;
+  border-top: 1px solid var(--line);
+  text-align: center;
+}
+
+.pastTitle {
+  margin: 0.5rem 0 0;
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" 108;
+  font-weight: 800;
+  font-size: clamp(1.6rem, 3vw, 2.3rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: var(--fg);
+}
+
+.pastLead {
+  margin: 0.8rem auto 0;
+  max-width: 62ch;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.pastDraws .tableWrap {
+  margin-top: 2rem;
+  text-align: left;
+}
+
+.pastDraws .tableWrap + .tableWrap {
+  margin-top: 1.6rem;
+}
+
+/* Seven columns do not compress; let it scroll rather than crush the numbers. */
+.pastTable {
+  min-width: 720px;
+}
+
+/* The period is the heading, the tally sits opposite it on one baseline. */
+.pastTable .tableCaption {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  color: var(--fg);
+}
+
+.captionMeta {
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+}
+
+.pastTable .statusCol {
+  width: 96px;
+  text-align: right;
+}
+
+.statusPill {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.statusPill.paid {
+  border-color: rgba(94, 196, 122, 0.4);
+  background: rgba(94, 196, 122, 0.1);
+  color: #7fd39a;
+}
+
+.statusPill.pending {
+  color: var(--muted);
+}
+
 @media (max-width: 760px) {
   .rafflePage {
     width: calc(100% - 2rem);

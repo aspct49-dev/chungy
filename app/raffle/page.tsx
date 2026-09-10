@@ -12,6 +12,7 @@ import {
 import { getRaffleData, nextDrawIso } from "../lib/raffle";
 import { DrawCountdown } from "../components/draw-countdown";
 import { RafflePodium } from "../components/raffle-podium";
+import { PastWinners } from "../components/past-winners";
 
 export const dynamic = "force-dynamic";
 
@@ -111,6 +112,8 @@ export default async function RafflePage() {
         {RAFFLE.winCapPerPlayer} times ({money(RAFFLE_PLAYER_CAP)}).
         {data.placeholder && " Showing sample entrants until the feed is connected."}
       </p>
+
+      <PastWinners />
     </main>
   );
 }

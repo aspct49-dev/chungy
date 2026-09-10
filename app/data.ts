@@ -197,3 +197,55 @@ export function ticketsFor(wagered: number) {
 export function ticketProgress(wagered: number) {
   return (wagered % WAGER_PER_TICKET) / WAGER_PER_TICKET;
 }
+
+// --- past draws ---------------------------------------------
+
+export type PastWinner = {
+  name: string;
+  wagered: number;
+  /**
+   * As recorded on the draw sheet. Not recomputed with ticketsFor: the sheet
+   * rounded where the site floors (294,573 was written up as 59 tickets, not
+   * 58), and the published odds were struck off these numbers. Recomputing
+   * would quietly disagree with the result that was actually paid out.
+   */
+  tickets: number;
+  spinsWon: number;
+  winnings: number;
+  paid: boolean;
+};
+
+export type PastDraw = {
+  /** Shown as the table caption. */
+  period: string;
+  winners: PastWinner[];
+};
+
+/** Newest first — the component renders them in array order. */
+export const PAST_DRAWS: PastDraw[] = [
+  {
+    period: "August 2026",
+    winners: [
+      { name: "SalfiMu", wagered: 294573, tickets: 59, spinsWon: 11, winnings: 2200, paid: true },
+      { name: "SabirTheGambler", wagered: 203457, tickets: 41, spinsWon: 6, winnings: 1200, paid: true },
+      { name: "Gang 72", wagered: 182147, tickets: 36, spinsWon: 5, winnings: 1000, paid: true },
+      { name: "GlitchyTomatoe6", wagered: 107664, tickets: 22, spinsWon: 3, winnings: 600, paid: true },
+      { name: "P250Z", wagered: 104001, tickets: 21, spinsWon: 3, winnings: 600, paid: true },
+      { name: "MarkusFred333", wagered: 77580, tickets: 16, spinsWon: 3, winnings: 600, paid: true },
+      { name: "steveo754", wagered: 44561, tickets: 9, spinsWon: 1, winnings: 200, paid: true },
+      { name: "homophobicracist", wagered: 13273, tickets: 3, spinsWon: 2, winnings: 400, paid: true },
+      { name: "ShyFresh04", wagered: 5024, tickets: 1, spinsWon: 1, winnings: 200, paid: true },
+    ],
+  },
+];
+
+export function drawTotals(draw: PastDraw) {
+  return draw.winners.reduce(
+    (totals, winner) => ({
+      tickets: totals.tickets + winner.tickets,
+      spins: totals.spins + winner.spinsWon,
+      paid: totals.paid + winner.winnings,
+    }),
+    { tickets: 0, spins: 0, paid: 0 }
+  );
+}
