@@ -249,6 +249,37 @@ export type PastDraw = {
 /** Newest first — the component renders them in array order. */
 export const PAST_DRAWS: PastDraw[] = [
   {
+    period: "September 2026",
+    totalTickets: 319,
+    entrants: 28,
+    winners: [
+      // Same shape as August: top wagerer paid a flat award and kept out of
+      // the spins. At 143 of 462 tickets, winning none of 35 would be a
+      // 1-in-425,000 result, so he was not in the draw.
+      {
+        name: "Greggy5",
+        wagered: 712667,
+        tickets: 143,
+        winnings: 3000,
+        paid: true,
+        note: "Top wager award",
+        outsideDraw: true,
+      },
+      { name: "ChungyFan777", wagered: 265616, tickets: 53, spinsWon: 8, winnings: 1600, paid: true },
+      { name: "MarkusFred333", wagered: 189588, tickets: 38, spinsWon: 2, winnings: 400, paid: true },
+      { name: "GlitchyTomatoe6", wagered: 177921, tickets: 36, spinsWon: 3, winnings: 600, paid: true },
+      { name: "SabirTheGambler", wagered: 158062, tickets: 32, spinsWon: 7, winnings: 1400, paid: true },
+      { name: "KnightSword", wagered: 97631, tickets: 20, spinsWon: 2, winnings: 400, paid: true },
+      { name: "p250zv2chungy", wagered: 88360, tickets: 18, spinsWon: 4, winnings: 800, paid: true },
+      { name: "MisterSpix", wagered: 87547, tickets: 18, spinsWon: 1, winnings: 200, paid: true },
+      { name: "Emptylung55", wagered: 77902, tickets: 16, spinsWon: 1, winnings: 200, paid: true },
+      { name: "MrXennt", wagered: 54435, tickets: 11, spinsWon: 2, winnings: 400, paid: true },
+      { name: "TobiHME", wagered: 47566, tickets: 10, spinsWon: 2, winnings: 400, paid: true },
+      { name: "Kerm22", wagered: 27197, tickets: 5, spinsWon: 2, winnings: 400, paid: true },
+      { name: "henzy99", wagered: 15425, tickets: 3, spinsWon: 1, winnings: 200, paid: true },
+    ],
+  },
+  {
     period: "August 2026",
     totalTickets: 244,
     entrants: 27,
