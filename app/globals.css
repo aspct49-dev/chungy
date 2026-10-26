@@ -3642,6 +3642,104 @@ body {
   color: #fff;
 }
 
+/* --- first place -------------------------------------------- */
+
+.firstPlace {
+  margin: 2.6rem auto 0;
+  max-width: 720px;
+  text-align: center;
+}
+
+.firstPlaceCard {
+  margin-top: 0.9rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.6rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.3rem 1.6rem;
+  border: 1px solid var(--gold-deep);
+  border-radius: 8px;
+  background:
+    radial-gradient(ellipse at 0% 0%, rgba(239, 168, 32, 0.12), transparent 60%),
+    linear-gradient(180deg, var(--panel-strong), var(--panel));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  text-align: left;
+}
+
+.firstPlaceWho {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.firstPlaceName {
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" 108;
+  font-weight: 800;
+  font-size: clamp(1.2rem, 2.6vw, 1.6rem);
+  letter-spacing: 0.01em;
+  color: var(--fg);
+  overflow-wrap: anywhere;
+}
+
+.firstPlaceMeta {
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.firstPlacePrize {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
+  margin-left: auto;
+}
+
+.firstPlacePrizeValue {
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" 108;
+  font-weight: 800;
+  font-size: clamp(1.7rem, 4vw, 2.4rem);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--gold-bright);
+  font-variant-numeric: tabular-nums;
+}
+
+.firstPlacePrizeLabel {
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.firstPlaceNote {
+  margin: 0.9rem auto 0;
+  max-width: 62ch;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+@media (max-width: 560px) {
+  /* Stacked, the prize reads as a figure in its own right rather than as
+     something hanging off the right edge of the name. */
+  .firstPlaceCard {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .firstPlacePrize {
+    margin-left: 0;
+    align-items: flex-start;
+  }
+}
+
 /* --- clock -------------------------------------------------- */
 
 .raffleClock {

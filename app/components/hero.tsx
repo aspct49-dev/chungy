@@ -72,8 +72,8 @@ export function Hero() {
           </h1>
 
           <p className="heroTagline">
-            {money(WAGER_PER_TICKET)} wagered. One ticket. {RAFFLE.spins} spins at{" "}
-            {money(RAFFLE.prizePerSpin)} each.
+            {money(WAGER_PER_TICKET)} wagered. One ticket.{" "}
+            {money(RAFFLE_POOL)} on the table every month.
           </p>
 
           <p className="heroSummary">
@@ -98,12 +98,12 @@ export function Hero() {
               <dd>{money(RAFFLE_POOL)}+</dd>
             </div>
             <div>
-              <dt>Spins per draw</dt>
-              <dd>{RAFFLE.spins}</dd>
+              <dt>First place</dt>
+              <dd>{money(RAFFLE.firstPlacePrize)}</dd>
             </div>
             <div>
-              <dt>Per spin</dt>
-              <dd>{money(RAFFLE.prizePerSpin)}</dd>
+              <dt>Spins per draw</dt>
+              <dd>{RAFFLE.spins}</dd>
             </div>
           </dl>
         </div>

@@ -70,17 +70,28 @@ export const WAGER_PER_TICKET = 5000;
 export const RAFFLE = {
   /** Drawn on the 1st of each month, so the countdown targets month end. */
   period: "month",
-  /** Spins per draw. Each spin pays PRIZE_PER_SPIN to whoever it lands on. */
+  /**
+   * Paid straight to the month's top wagerer, who then sits out the spins.
+   * It is not drawn and not weighted — finishing first is the whole condition.
+   */
+  firstPlacePrize: 3000,
+  /** Spins per draw. Each spin pays prizePerSpin to whoever it lands on. */
   spins: 35,
   prizePerSpin: 200,
   /** One player can win at most this many times in a single draw. */
   winCapPerPlayer: 13,
 } as const;
 
-/** 35 x $200. The floor, not a fixed figure — see RAFFLE_POOL_NOTE. */
-export const RAFFLE_POOL = RAFFLE.spins * RAFFLE.prizePerSpin;
+/** 35 x $200, shared out by the spins among everyone except first place. */
+export const RAFFLE_SPIN_POOL = RAFFLE.spins * RAFFLE.prizePerSpin;
 
-/** Most a single player can take home in one draw: 13 x $200. */
+/** $3,000 + $7,000. The floor, not a fixed figure — see RAFFLE_POOL_NOTE. */
+export const RAFFLE_POOL = RAFFLE.firstPlacePrize + RAFFLE_SPIN_POOL;
+
+/**
+ * Most a player can take out of the spins: 13 x $200. First place is not
+ * bound by it, because the first-place prize is not won off a spin.
+ */
 export const RAFFLE_PLAYER_CAP = RAFFLE.winCapPerPlayer * RAFFLE.prizePerSpin;
 
 export const RAFFLE_POOL_NOTE =

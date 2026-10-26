@@ -1,12 +1,18 @@
 import Image from "next/image";
 import Link from "next/link";
 import ticketArt from "../../public/ticket.png";
-import { RAFFLE_POOL, WAGER_PER_TICKET, count, money } from "../data";
+import { RAFFLE, RAFFLE_POOL, WAGER_PER_TICKET, count, money } from "../data";
 import { getRaffleData, nextDrawIso } from "../lib/raffle";
 import { DrawCountdown } from "./draw-countdown";
 
 export async function RafflePromo() {
   const data = await getRaffleData();
+
+  // The banner counts the whole month, first place included. getRaffleData
+  // reports totals for the spin pot alone, which is the right denominator for
+  // odds on the raffle page but would quietly drop a player here.
+  const tickets = data.totalTickets + (data.firstPlace?.tickets ?? 0);
+  const entrants = data.entrantCount + (data.firstPlace ? 1 : 0);
 
   return (
     <section className="promoBanner" aria-label="Monthly raffle preview" data-reveal="section">
@@ -16,7 +22,8 @@ export async function RafflePromo() {
         </h2>
         <p>
           Every {money(WAGER_PER_TICKET)} wagered is one more ticket in the vault.
-          One ticket is all it takes.
+          Top wagerer takes {money(RAFFLE.firstPlacePrize)}; for the rest, one
+          ticket is all it takes.
         </p>
         <Link className="btn btnGold" href="/raffle">
           View the raffle
@@ -27,13 +34,13 @@ export async function RafflePromo() {
         <Image className="promoTicket" src={ticketArt} alt="" sizes="260px" />
 
         <div className="promoStat">
-          <span className="promoStatValue">{count(data.totalTickets)}</span>
+          <span className="promoStatValue">{count(tickets)}</span>
           <span className="promoStatLabel">tickets in the vault</span>
         </div>
 
         <div className="promoStatRow">
           <div className="promoStatSm">
-            <span>{count(data.entrantCount)}</span>
+            <span>{count(entrants)}</span>
             <small>entrants</small>
           </div>
           <div className="promoStatSm">

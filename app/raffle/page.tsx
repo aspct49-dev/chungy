@@ -4,6 +4,7 @@ import {
   RAFFLE,
   RAFFLE_PLAYER_CAP,
   RAFFLE_POOL,
+  RAFFLE_SPIN_POOL,
   WAGER_PER_TICKET,
   count,
   maskedName,
@@ -13,12 +14,13 @@ import { getRaffleData, nextDrawIso } from "../lib/raffle";
 import { DrawCountdown } from "../components/draw-countdown";
 import { RafflePodium } from "../components/raffle-podium";
 import { PastWinners } from "../components/past-winners";
+import { FirstPlace } from "../components/first-place";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Raffle",
-  description: `Every ${money(WAGER_PER_TICKET)} wagered on ${CASINO.name} under code ${CASINO.code} earns a ticket in the monthly ${money(RAFFLE_POOL)} raffle.`,
+  description: `Every ${money(WAGER_PER_TICKET)} wagered on ${CASINO.name} under code ${CASINO.code} earns a ticket in the monthly ${money(RAFFLE_POOL)} raffle — ${money(RAFFLE.firstPlacePrize)} to the top wagerer and ${money(RAFFLE_SPIN_POOL)} across ${RAFFLE.spins} spins.`,
   alternates: { canonical: "/raffle" },
 };
 
@@ -45,10 +47,12 @@ export default async function RafflePage() {
 
         <p className="raffleSub">
           Every {money(WAGER_PER_TICKET)} wagered under code {CASINO.code} earns
-          one ticket. {RAFFLE.spins} spins, {money(RAFFLE.prizePerSpin)}{" "}
-          each &mdash; capped at {RAFFLE.winCapPerPlayer} wins (
-          {money(RAFFLE_PLAYER_CAP)}) per player, so one account cannot take the
-          whole pool.
+          one ticket. The month&rsquo;s top wagerer takes{" "}
+          {money(RAFFLE.firstPlacePrize)} outright; the remaining{" "}
+          {money(RAFFLE_SPIN_POOL)} goes to everyone else over {RAFFLE.spins}{" "}
+          spins of {money(RAFFLE.prizePerSpin)} &mdash; capped at{" "}
+          {RAFFLE.winCapPerPlayer} wins ({money(RAFFLE_PLAYER_CAP)}) per player,
+          so one account cannot take the whole pool.
         </p>
 
         <div className="raffleCta">
@@ -65,6 +69,8 @@ export default async function RafflePage() {
           </a>
         </div>
       </section>
+
+      <FirstPlace entrant={data.firstPlace} />
 
       <RafflePodium entrants={data.entrants} />
 
@@ -107,7 +113,9 @@ export default async function RafflePage() {
 
       <p className="raffleFoot">
         Usernames are masked for privacy. Standings update as wagers are
-        processed. Every ticket holder is entered &mdash; more tickets is better
+        processed. Odds are each player&rsquo;s share of the{" "}
+        {money(RAFFLE_SPIN_POOL)} spin pot, which first place is not part of.
+        Every other ticket holder is entered &mdash; more tickets is better
         odds, not a reserved prize. One player can win up to{" "}
         {RAFFLE.winCapPerPlayer} times ({money(RAFFLE_PLAYER_CAP)}).
         {data.placeholder && " Showing sample entrants until the feed is connected."}

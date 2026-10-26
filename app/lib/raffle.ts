@@ -4,14 +4,26 @@ export type Entrant = {
   name: string;
   wagered: number;
   tickets: number;
-  /** Share of the ticket pot, 0-1. Honest only because the full list is kept. */
+  /**
+   * Share of the spin pot, 0-1. Honest only because the full list is kept.
+   * Always 0 for first place, who takes a flat prize instead of a stake.
+   */
   odds: number;
 };
 
 export type RaffleData = {
+  /**
+   * The month's top wagerer. Takes the first-place prize outright and is kept
+   * out of the spins, so their tickets are not in the pot the spins draw from.
+   */
+  firstPlace: Entrant | null;
+  /** Everyone below first place — the people the 35 spins are drawn over. */
   entrants: Entrant[];
+  /** Tickets in the spin pot. First place's are deliberately not counted. */
   totalTickets: number;
+  /** Across everyone holding a ticket, first place included. */
   totalWagered: number;
+  /** Players in the spins, so first place is not counted. */
   entrantCount: number;
   /** True when no live source is configured and sample data is showing. */
   placeholder: boolean;
@@ -88,17 +100,26 @@ export function toRaffleData(
     .filter((row) => row.tickets > 0)
     .sort((a, b) => b.tickets - a.tickets || b.wagered - a.wagered);
 
-  const totalTickets = withTickets.reduce((sum, row) => sum + row.tickets, 0);
   const totalWagered = withTickets.reduce((sum, row) => sum + row.wagered, 0);
 
+  // Tickets rise with the wager, so the top of this sort is also the top
+  // wagerer, and the tie-break on wagered settles equal ticket counts.
+  const [leader, ...rest] = withTickets;
+
+  // The spins are drawn over everyone but first place, so the pot has to be
+  // summed after the split. Leaving the leader in would divide a 35-spin draw
+  // by tickets that cannot win it, and understate everyone else's real odds.
+  const totalTickets = rest.reduce((sum, row) => sum + row.tickets, 0);
+
   return {
-    entrants: withTickets.map((row) => ({
+    firstPlace: leader ? { ...leader, odds: 0 } : null,
+    entrants: rest.map((row) => ({
       ...row,
       odds: totalTickets > 0 ? row.tickets / totalTickets : 0,
     })),
     totalTickets,
     totalWagered,
-    entrantCount: withTickets.length,
+    entrantCount: rest.length,
     placeholder: meta.placeholder ?? false,
     error: meta.error ?? null,
   };

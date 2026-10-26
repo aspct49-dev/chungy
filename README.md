@@ -66,13 +66,20 @@ against the deployed site.
 Confirmed rules, encoded in `app/data.ts`:
 
 - **1 ticket per $5,000 wagered** (`WAGER_PER_TICKET`) under the code.
-- The wheel is spun **35 times** per monthly draw (`RAFFLE.spins`), each spin
-  paying **$200** (`RAFFLE.prizePerSpin`) — a **$7,000** pool.
+- The month pays out **$10,000** (`RAFFLE_POOL`), split two ways.
+- **First place takes $3,000** (`RAFFLE.firstPlacePrize`) — the top wagerer,
+  paid outright with no spin involved, and then kept out of the draw. Their
+  tickets are therefore **not** in the pot the spins are drawn from, which is
+  what `toRaffleData()` splits off before it works out anyone's odds.
+- The remaining **$7,000** (`RAFFLE_SPIN_POOL`) goes to everyone else: the
+  wheel is spun **35 times** (`RAFFLE.spins`) at **$200** a spin
+  (`RAFFLE.prizePerSpin`).
 - A player can win **more than once**, capped at **13 wins / $2,600**
-  (`RAFFLE.winCapPerPlayer`, `RAFFLE_PLAYER_CAP`).
+  (`RAFFLE.winCapPerPlayer`, `RAFFLE_PLAYER_CAP`). The cap applies to the
+  spins; first place is outside it.
 - Wagering is **unweighted** — every game and every dollar counts the same.
-- $7,000 is the **floor**, not a fixed figure. The pool is raised in months with
-  unusually high wagering, which is why the site says "$7,000+".
+- $10,000 is the **floor**, not a fixed figure. The pool is raised in months
+  with unusually high wagering, which is why the site says "$10,000+".
 
 Rules are subject to change if Gamdom changes the programme.
 
